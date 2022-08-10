@@ -1,0 +1,58 @@
+{% extends 'home.html '%}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container">
+    <br/><br/><br/><br/><br/><br/><br/><br/>
+            <div class="row justify-content-center">
+              <div class="col-md-8">
+                <div class="card-group mb-0">
+                  <div class="card p-4">
+                    <div class="card-body">
+
+
+                      <form method="POST">
+                        {% csrf_token %}
+                      <h2>Acceso</h2>
+                      <p class="text-muted">Ingresa tu cuenta</p>
+                      <div class="input-group mb-3">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span> &nbsp; &nbsp;
+                        {% comment %} <input type="text" class="form-control" placeholder="Username"> {% endcomment %}
+                        {{ form.username }}
+                      </div>
+                      <div class="input-group mb-4">
+                        <span class="input-group-addon"><i class="fa fa-lock"></i></span> &nbsp; &nbsp;
+                        {% comment %} <input type="password" class="form-control" placeholder="Password"> {% endcomment %}
+                        {{ form.password }}
+                      </div>
+                      <div class="row">
+                        <div class="col-6">
+                          <input type="submit" class="btn btn-primary px-4" value ="Ingresar">
+                        </div>
+                      </form>
+                        <div class="col-6">
+                          <a href="#" class="btn btn-link px-4"> ¿Olvidaste tu Contraseña? </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card text-white bg-primary py-5 d-md-down-none" style="width:44%">
+                    <div class="card-body text-center">
+                      <div>
+                        <h2>Regístrate</h2>
+                        <p align="justify">Registrate totalmente gratis para poder sacar Cita, recibir notificaciones deberás llenar tus antecedentes médicos, para llevar tu expediente y poder atenderte como es debido y te mantengas saludable.</p>
+                        <a href="#" class="btn btn-primary active mt-3">Registrate Ahora!</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br/><br/><br/><br/><br/>
+        <script src="" async defer></script>
+
+{% endblock %}
