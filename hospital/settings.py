@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'hospitapp',
     'django_extensions',
     'crispy_forms',
+    'tempus_dominus',
 ]
 
 MIDDLEWARE = [
@@ -137,6 +138,19 @@ AUTH_USER_MODEL = 'hospitapp.User'
 
 CRISPY_TEMPLATE_PACK = 'uni_form'
 
-LOGIN_REDIRECT_URL ='/home'
+LOGIN_REDIRECT_URL ='home'
 
-LOGOUT_REDIRECT_URL = '/home'
+LOGOUT_REDIRECT_URL = 'home'
+
+# Tempus Dominus - Date Picker settings
+
+# TEMPUS_DOMINUS_LOCALIZE = True
+# # (default: False): if True, widgets will be translated to the selected browser language and use the localized date and time formats.
+# TEMPUS_DOMINUS_INCLUDE_ASSETS  = True
+# # (default: True): if True, loads Tempus Dominus and moment JS and CSS from Cloudflare's CDN, otherwise loading the JS and CSS are up to you.
+# TEMPUS_DOMINUS_DATE_FORMAT = 'DD-MM-YYYY'
+# # (default: YYYY-MM-DD)
+# TEMPUS_DOMINUS_DATETIME_FORMAT = 'DD-MM-YYYY HH:mm:ss'
+# # (default: YYYY-MM-DD HH:mm:ss)
+# TEMPUS_DOMINUS_TIME_FORMAT = 'HH:mm:ss'
+# # (default: HH:mm:ss)

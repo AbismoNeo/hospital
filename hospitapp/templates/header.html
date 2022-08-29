@@ -37,18 +37,20 @@
           <li><a class="nav-link scrollto" href="{% url 'doctors' %}">Doctores</a></li>
           
           {% if user.is_authenticated %}
-          <li class="dropdown"><a href="#"><span>Cuenta</span> <i class="bi bi-chevron-down"></i></a>
+          
+          <li class="dropdown"><a href="#"><span>Cuenta de {{paciente.first_name}}</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a class="nav-link scrollto" href="#">Perfil</a></li>
               <li><a class="nav-link scrollto" href="{% url 'logout' %}">Salir</a></li>
             </ul>
           </li>
           
+
             {% else %}
             <li class="dropdown"><a href="#"><span>Ingresar</span> <i class="bi bi-chevron-down"></i></a>
               <ul>
-                <li><a href="#">Registrarse</a></li>
-                <li><a href="{% url 'login' %}">Ingresar</a></li>
+                <li><a href="{% url 'register_patient' %}">Registrarse</a></li>
+                <li><a href="{% url 'loginuser' %}">Ingresar</a></li>
               </ul>
             </li>
             {% endif %}
@@ -57,10 +59,10 @@
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
-      {% if not users.is_authenticated %}
-        <a href="#Registrarse" class="appointment-btn scrollto"><span class="d-none d-md-inline">Hacer una</span> Cita Medica</a>
+      {% if user.is_authenticated %}
+      <a href="{% url 'register_appointment' %}" class="appointment-btn scrollto"><span class="d-none d-md-inline">Hacer una</span> Cita Medica</a>
       {% else %}
-        <a href="#cita" class="appointment-btn scrollto"><span class="d-none d-md-inline">Hacer una</span> Cita Medica</a>
+        <a href="{% url 'register_patient' %}" class="appointment-btn scrollto"><span class="d-none d-md-inline">Hacer una</span> Cita Medica</a>
       {% endif %}
 
     </div>

@@ -136,6 +136,9 @@ class User(AbstractUser):
     es_admin = models.BooleanField(default=False)
     es_secretaria = models.BooleanField(default=False)
 
+    def __str__(self):
+        cadena=self.first_name+" "+self.last_name
+        return cadena
     class Meta:
         db_table = 'auth_user'
         verbose_name = 'Usuario'
