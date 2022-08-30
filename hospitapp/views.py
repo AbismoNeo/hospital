@@ -1,3 +1,4 @@
+from distutils import errors
 from django.contrib.auth import get_user_model
 from re import TEMPLATE
 from django.shortcuts import redirect, render
@@ -25,18 +26,19 @@ User = get_user_model()
 # Create your views here.
 # El home de la pagina donde se cambian los menus por usuario.
 def home(request):
-    try:
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            print(user)
-        print(request.paciente)
+    username_post = request.user['username']
+    password_post = request.user['password']
+    if user.is_authenticated:
         query = User.objects.get(username = request.User)
         print(query)
-    except:
+    else:
+        user = authenticate(request, username=username_post, password=password_post)
+        query = User.objects.get(username = request.User)
+        print(query)
+    else:
         query = None
         User.is_authenticated = False
+    
     if User.is_authenticated:
         if query.is_superuser == True:
             # MENU SUPERUSER
@@ -95,18 +97,17 @@ def home(request):
 #Login
 def loginuser(request):
     loginform = LoginForm(request.POST)
-    try:
-        if request.method == "POST":
-            username = request.POST['username']
-            password = request.POST['password']
-            user = authenticate(request, username=username, password=password)
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            return redirect('home')
+        else:
+            user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
             if user is not None:
-                messages.success(request, 'Datos Correctos... Ingresando')
-                return redirect((settings.LOGIN_URL, request.path))
+                login(request, user)
+                return redirect('home')
             else:
-                messages.error(request, 'Usuario o Contraseña incorrecto.')
                 return redirect('loginuser')
-    except:
+    else:
         loginform = LoginForm()
     return render(request,'loginuser.html',{'loginuserform':loginform})
 

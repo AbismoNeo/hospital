@@ -62,10 +62,10 @@ class PacienteRegisterForm(UserCreationForm):
 class LoginForm(forms.ModelForm):
     username = forms.CharField( 
                                 label='Usuario',
-                                widget=forms.TextInput(attrs={'class': 'fa fa-user form-control'}))
+                                widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(
                                 label='Contraseña',
-                                widget=(forms.PasswordInput(attrs={'class': 'fa fa-lock form-control'})))
+                                widget=(forms.PasswordInput(attrs={'class': 'form-control'})))
 
     class Meta:
         model = User

@@ -487,7 +487,7 @@ h6 {
   font-size: 48px;
   font-weight: 700;
   line-height: 56px;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   color: #2c4964;
 }
 
@@ -499,7 +499,7 @@ h6 {
 
 #hero .btn-get-started {
   font-family: "Raleway", sans-serif;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   font-weight: 500;
   font-size: 14px;
   letter-spacing: 1px;
