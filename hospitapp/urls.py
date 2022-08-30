@@ -16,6 +16,7 @@ urlpatterns = [
     path('loginuser/', views.loginuser, name = 'loginuser'),
     path('logout/', LogoutView.as_view(),name = 'logout'),
     path('register_patient/', views.register_patient, name = 'register_patient'),
-    path('register_appointment/', views.register_appointment, name = 'register_appointment')
+    path('register_appointment/', views.register_appointment, name = 'register_appointment'),
+    path('user_profile/<int:id>/', views.user_profile, name = 'user_profile'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

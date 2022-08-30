@@ -1,0 +1,24 @@
+{% extends 'home.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<section id="user_profile" class="services">
+    <br/><br/><br/><br/>
+    <div class="container">
+        <h4> Perfil de Usuario </h4>
+        <form method = "POST" autocomplete="off">
+        <div class="form-group">
+            <table class="table table-striped|table-responsive">
+            {% csrf_token %}
+            {{ perfil.as_table }}
+            </table>
+        </div>
+        <div class="form-actions">
+            <input name="register" id="" class="btn btn-primary" type="submit" value="MODIFICAR">
+            <a href="{% url 'home' %}" class="btn btn-warning" >CANCELAR</a>
+        </div>
+    </form>
+    </div>
+</section>
+
+{% endblock %}

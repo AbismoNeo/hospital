@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 import os
 from django.conf import settings
 from . import forms
-from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm
+from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
@@ -24,60 +24,62 @@ messages.error(request, 'Documento eliminado.')
 User = get_user_model()
 
 # Create your views here.
+################################
 # El home de la pagina donde se cambian los menus por usuario.
+################################
+
 def home(request):
-    username_post = request.user['username']
-    password_post = request.user['password']
-    if user.is_authenticated:
-        query = User.objects.get(username = request.User)
-        print(query)
+    username_get = request.user.username
+    user_id = request.user.id
+    print(username_get)
+    print(user_id)
+    if User.is_authenticated:
+        print("autenticado")
+        querybd = User.objects.get(pk = user_id)
+        print(querybd.first_name)
     else:
-        user = authenticate(request, username=username_post, password=password_post)
-        query = User.objects.get(username = request.User)
-        print(query)
-    else:
-        query = None
+        querybd = None
         User.is_authenticated = False
     
     if User.is_authenticated:
-        if query.is_superuser == True:
+        if querybd.is_superuser == True:
             # MENU SUPERUSER
             print('Super')
             menu = 0
         else:
-            if query.es_admin == True:
+            if querybd.es_admin == True:
                 # MENU ADMIN-SISTEMA
                 print('Admin')
                 menu = 1
-                if query.es_doctor:
+                if querybd.es_doctor:
                     # MENU ADMIN-DOCTOR
                     print('Admin Doc')
                     menu = 2
-                elif query.es_enfermera == True:
+                elif querybd.es_enfermera == True:
                     # MENU ADMIN-ENFERMERA
                     print('Admin Enfer')
                     menu = 3
-                elif query.es_farmacia == True:
+                elif querybd.es_farmacia == True:
                     # MENU ADMIN-FARMACIA
                     print('Admin Farm')
                     menu = 4
-            elif query.es_paciente == True:
+            elif querybd.es_paciente == True:
                 # MENU PACIENTE
                 print('Paciente')
                 menu  = 5
-            elif query.es_doctor == True:
+            elif querybd.es_doctor == True:
                 print('Doc')
                 # MENU DOCTOR
                 menu = 6
-            elif query.es_enfermera == True:
+            elif querybd.es_enfermera == True:
                 #MENU ENFERMERA
                 print('Enfermera')
                 menu = 7
-            elif query.es_farmacia == True:
+            elif querybd.es_farmacia == True:
                 # MENU FARMACIA
                 print('Farmacia')
                 menu = 8
-            elif query.es_secretaria == True:
+            elif querybd.es_secretaria == True:
                 # MENU SECRETARIA
                 print('Secretaria')
                 menu = 9
@@ -89,12 +91,15 @@ def home(request):
     
     context = {
         'Title':'Hospitapp - Hospital MY-ANGELS',
-        'paciente':query,
+        'paciente':querybd,
         'menu' : menu,
     }
     return render(request,'index.html',context)
 
+################################
 #Login
+################################
+
 def loginuser(request):
     loginform = LoginForm(request.POST)
     if request.method == "POST":
@@ -111,8 +116,10 @@ def loginuser(request):
         loginform = LoginForm()
     return render(request,'loginuser.html',{'loginuserform':loginform})
 
-
+################################
 #Paginas del sitio generales
+################################
+
 def faqs(request):
     context = {
         'Title':'Hospitapp - Preguntas Frecuentes',
@@ -146,7 +153,9 @@ def testimonials(request):
     }
     return render(request,'testimonials.html',context)
 
+################################
 #Registrar a un paciente desde la pagina
+################################
 
 def register_patient(request):
     paciente = PacienteRegisterForm(request.POST)
@@ -163,7 +172,28 @@ def register_patient(request):
         paciente = PacienteRegisterForm()
     return render(request, 'register_paciente.html',{'paciente':paciente})
 
+################################
+# Modificar el perfil de usuario
+################################
+
+def user_profile(request,id):
+    user_id = id
+
+    if request.method == 'POST':
+        ProfileForm(request.POST)
+        if profile.is_valid():
+            profile = profile.save()
+            return redirect('home')
+        else:
+            print(profile.non_field_errors)
+            print(profile.errors)
+    else:
+        profile = ProfileForm()
+    return redirect('home')
+
+################################
 #Registrar un cita 
+################################
 
 def register_appointment(request):
     cita = RegistroCitasForm(request.POST)
@@ -173,7 +203,6 @@ def register_appointment(request):
             cita = cita.save()
             messages.success(request, 'La cita fue registrada correctamente.')
             return redirect('home')
-
         else:
             messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
             print(cita.non_field_errors)
