@@ -178,18 +178,29 @@ def register_patient(request):
 
 def user_profile(request,id):
     user_id = id
-
     if request.method == 'POST':
-        ProfileForm(request.POST)
+        profile = ProfileForm(request.POST)
         if profile.is_valid():
-            profile = profile.save()
+            usuario = User.objects.get(pk=user_id)
+            usuario.first_name = profile['first_name'].value()
+            usuario.last_name = profile['last_name'].value()
+            usuario.email = profile['email'].value()
+            usuario.rfc = profile['rfc'].value()
+            usuario = usuario.save()
+            print('valido y save')
             return redirect('home')
+            
         else:
             print(profile.non_field_errors)
             print(profile.errors)
     else:
-        profile = ProfileForm()
-    return redirect('home')
+        datos = User.objects.get(pk = user_id)
+        profile = ProfileForm(request.POST or None, instance = datos)        
+        print('solo cargamos datos')
+        paciente = datos
+    #return redirect('user_profile', id = user_id)
+    print(paciente)
+    return render(request,'user_profile.html', {'paciente':paciente, 'profile' : profile})
 
 ################################
 #Registrar un cita 

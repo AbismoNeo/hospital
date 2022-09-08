@@ -103,7 +103,8 @@ class ProfileForm(UserCreationForm):
                                 help_text=('Requerido. 15 caracteres o menos, letras, digitos y @/./+/-/_ solamente.'), 
                                 validators=[username_validator], 
                                 error_messages={'unique': ("Ya existe un usuario con ese nombre de Usuario.")}, 
-                                widget=forms.TextInput(attrs={'class': 'form-control'}))
+                                disabled = True,
+                                widget=forms.TextInput(attrs={'class': 'form-control', }))
     first_name = forms.CharField(
                                 label='Nombre(s)',
                                 max_length=32, 
@@ -121,6 +122,7 @@ class ProfileForm(UserCreationForm):
                                 max_length=15, 
                                 min_length=13, 
                                 required=True, 
+                                disabled = True,
                                 widget=(forms.TextInput(attrs={'class': 'form-control'})))
     email = forms.EmailField(label = 'Email',
                                 max_length=50, 
@@ -131,3 +133,4 @@ class ProfileForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name','rfc','email',)
+        #exclude = ['password1','password2']
