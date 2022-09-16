@@ -5,6 +5,8 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpResponseRedirect
 import os
 from django.conf import settings
+
+from hospitapp.models import cita_paciente, cita_turno, medical_staff
 from . import forms
 from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm
 from django.contrib.auth import authenticate, login
@@ -179,45 +181,61 @@ def register_patient(request):
 def user_profile(request,id):
     user_id = id
     if request.method == 'POST':
+        print("Post")
+        datos = User.objects.get(pk = user_id)
         profile = ProfileForm(request.POST)
-        if profile.is_valid():
-            usuario = User.objects.get(pk=user_id)
-            usuario.first_name = profile['first_name'].value()
-            usuario.last_name = profile['last_name'].value()
-            usuario.email = profile['email'].value()
-            usuario.rfc = profile['rfc'].value()
-            usuario = usuario.save()
+        datos.id = user_id
+        print(datos.id)
+        datos.username = profile['username'].value()
+        print(datos.username)
+        datos.first_name = profile['first_name'].value()
+        print(datos.first_name)
+        datos.last_name = profile['last_name'].value()
+        print(datos.last_name)
+        datos.email = profile['email'].value()
+        print(datos.email)
+        datos.rfc = profile['rfc'].value()
+        print(datos.rfc)
+        try:
+            usuario = datos.save()
+            paciente = datos
+            profile = ProfileForm(request.POST or None, instance = datos)    
             print('valido y save')
             return redirect('home')
-            
-        else:
-            print(profile.non_field_errors)
-            print(profile.errors)
+        except Exception as e:
+            print(e)
+            profile = ProfileForm(request.POST or None, instance = datos)
+            paciente = datos
     else:
         datos = User.objects.get(pk = user_id)
         profile = ProfileForm(request.POST or None, instance = datos)        
         print('solo cargamos datos')
-        paciente = datos
-    #return redirect('user_profile', id = user_id)
-    print(paciente)
+    paciente = datos
     return render(request,'user_profile.html', {'paciente':paciente, 'profile' : profile})
 
 ################################
 #Registrar un cita 
 ################################
 
-def register_appointment(request):
-    cita = RegistroCitasForm(request.POST)
+def register_appointment(request,id):
+    
     if request.method == 'POST':
-        if cita.is_valid():
-            cita.es_paciente = True
-            cita = cita.save()
+        cita = RegistroCitasForm(request.POST or None)
+        paciente = User.objects.get(pk = id)
+        hora = cita_turno.objects.get(pk = request.POST['id_hora'])
+        doctor = User.objects.get(pk = request.POST['id_doctor'])
+        fechacita = request.POST['fecha_cita']
+        citas_medico = cita_paciente(id_paciente = paciente ,fecha_cita = fechacita, id_hora = hora, id_doctor = doctor)
+        try:
+            citas_medico.save()
             messages.success(request, 'La cita fue registrada correctamente.')
             return redirect('home')
-        else:
-            messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
-            print(cita.non_field_errors)
-            print(cita.errors)
+        except:
+            print("errors")
+            #messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
     else:
-        cita = RegistroCitasForm()
-    return render(request, 'registrar_cita.html',{'cita':cita})
+        cita = RegistroCitasForm(request.POST or None)
+        paciente = User.objects.get(pk = id)
+    cita = RegistroCitasForm()
+    paciente = User.objects.get(pk = id)
+    return render(request, 'register_appointment.html',{'cita':cita , 'paciente':paciente,})

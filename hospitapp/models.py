@@ -20,15 +20,18 @@ class cat_especialidades(models.Model):
     especialidad = models.CharField(max_length=100, verbose_name='Especialidad')
     class Meta:
         verbose_name = 'Catalogo de Especialidades'
+    
+    def __str__(self):
+        return self.especialidad
 
 # CATALOGO DE ESCUELAS
 class cat_escuelas(models.Model):
     escuela = models.CharField(max_length=100, verbose_name='Universidad')
     class Meta:
         verbose_name = 'Catalogo de Universidades'
-
-
-# CATALOGO DE GENEROS
+    
+    def __str__(self):
+        return self.escuela
 class cat_genero(models.Model):
     genero = models.CharField(max_length=50, verbose_name='Genero')
     class Meta:
@@ -642,17 +645,19 @@ class surtir_recetas(models.Model):
     
 #AGENDAR CITAS
 class cita_paciente (models.Model):
-    id_paciente = models.ForeignKey('patients', verbose_name=("Paciente"), on_delete=models.CASCADE)
+    id_paciente = models.ForeignKey('User', verbose_name=("Paciente"), related_name="Paciente_Cita", on_delete=models.CASCADE)
     fecha_cita = models.DateField(auto_now=False, auto_now_add=False, verbose_name = "Fecha de la cita")
-    id_hora = models.CharField(max_length=30, verbose_name = "Hora de la Cita")
-    id_doctor = models.ForeignKey('medical_staff', verbose_name=("Doctor/Especialista"), on_delete=models.CASCADE)
+    id_hora = models.ForeignKey('cita_turno', on_delete = models.CASCADE, verbose_name = "Hora de la Cita")
+    id_doctor = models.ForeignKey('User', verbose_name=("Doctor/Especialista"), related_name ="Doctor_Cita", on_delete=models.CASCADE)
 
 #CITAS (HORAS) POR TURNOS
 class cita_turno (models.Model):
     Turnos = (("Matutino","Matutino"),("Vespertino","Vespertino"),("Nocturno","Nocturno"))
     hora = models.CharField(max_length=30, verbose_name = "Hora de la Cita")
     turno = models.CharField(verbose_name = 'Turno', max_length= 10, choices=Turnos, default = "")
-
+    def __str__(self):
+        cadena=self.hora
+        return cadena
 """
 ###################################################################################
 ###################################################################################

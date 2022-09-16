@@ -6,7 +6,7 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.auth import get_user_model
 import datetime
-from hospitapp.models import cita_paciente, cita_turno
+from hospitapp.models import cita_paciente, cita_turno, medical_staff
 from tempus_dominus.widgets import DatePicker
 #TimePicker, DateTimePicker
 
@@ -76,13 +76,17 @@ class LoginForm(forms.ModelForm):
         self.fields['username'].help_text = None
         self.fields['password'].help_text = None
 
-class RegistroCitasForm(forms.ModelForm):
 
+sql = 'SELECT hms.id, au.first_name, au.last_name FROM  hospitapp_medical_staff hms, auth_user au WHERE hms.user_id = au.id AND  au.es_doctor  = TRUE'
+qs = medical_staff.objects.raw (sql)
+
+class RegistroCitasForm(forms.ModelForm):
+    
     fecha_cita = input_formats=['%d/%m/%Y %H:%M']
 
     id_hora = forms.ModelChoiceField(
                             label='Hora', 
-                            queryset=cita_turno.objects.values_list('hora',flat=True)
+                            queryset=cita_turno.objects.all()
                             )
     id_doctor = forms.ModelChoiceField(
                             label='Doctor', 
@@ -96,15 +100,16 @@ class RegistroCitasForm(forms.ModelForm):
         fields = ('fecha_cita', 'id_hora', 'id_doctor','id_paciente',)
     
 
-class ProfileForm(UserCreationForm):
+
+class ProfileForm(forms.ModelForm):
     username = forms.CharField( 
                                 label='Usuario',
                                 max_length=15, 
                                 help_text=('Requerido. 15 caracteres o menos, letras, digitos y @/./+/-/_ solamente.'), 
                                 validators=[username_validator], 
                                 error_messages={'unique': ("Ya existe un usuario con ese nombre de Usuario.")}, 
-                                disabled = True,
-                                widget=forms.TextInput(attrs={'class': 'form-control', }))
+                                #readonly = True,
+                                widget=forms.TextInput(attrs={'class': 'form-control', 'readonly':'readonly', }))
     first_name = forms.CharField(
                                 label='Nombre(s)',
                                 max_length=32, 
@@ -122,8 +127,8 @@ class ProfileForm(UserCreationForm):
                                 max_length=15, 
                                 min_length=13, 
                                 required=True, 
-                                disabled = True,
-                                widget=(forms.TextInput(attrs={'class': 'form-control'})))
+                                #readonly = True,
+                                widget=(forms.TextInput(attrs={'class': 'form-control', 'readonly':'readonly',})))
     email = forms.EmailField(label = 'Email',
                                 max_length=50, 
                                 min_length=10, 
