@@ -41,6 +41,7 @@
           <li class="dropdown"><a href="#"><span>Cuenta de {{paciente.first_name}}</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a class="nav-link scrollto" href="{% url 'user_profile' paciente.id %}">Perfil</a></li>
+              <li><a class="nav-link scrollto" href="{% url 'list_appointment' paciente.id %}">Citas</a></li>
               <li><a class="nav-link scrollto" href="{% url 'logout' %}">Salir</a></li>
             </ul>
           </li>

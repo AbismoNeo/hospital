@@ -239,3 +239,45 @@ def register_appointment(request,id):
     cita = RegistroCitasForm()
     paciente = User.objects.get(pk = id)
     return render(request, 'register_appointment.html',{'cita':cita , 'paciente':paciente,})
+
+
+def list_appointment(request, id):
+    if User.is_authenticated:
+        user_id = id
+        print("##### USER ID ####")
+        print(user_id)
+        print("##### FIRST NAME ####")
+        user_first_name_get = request.user.first_name
+        print(user_first_name_get)
+        user_last_name_get = request.user.last_name
+        print("##### LAST NAME ####")
+        print(user_last_name_get)
+        #Genera un Diccionario
+        appointments = cita_paciente.objects.filter(id_paciente = id).values( 'id_doctor__first_name', 'id_doctor__last_name', 'id_hora__hora', 'fecha_cita')
+        #Genera una Tupla
+        #appointments = cita_paciente.objects.filter(id_paciente = id).values_list( 'id_doctor__first_name', 'id_doctor__last_name', 'id_hora__hora', 'fecha_cita')
+        print("##### APPOINTMENT ####")
+        print(appointments)
+        paciente  = User.objects.get(pk = user_id)
+    else:
+        return redirect('home')
+    return render(request,'list_appointments.html',{'cita':appointments, 'paciente': paciente})
+
+
+"""
+hora_cita
+cita_dcotor
+
+SELECT   "hospitapp_cita_paciente"."fecha_cita",
+         "hospitapp_cita_turno"."hora",
+         "auth_user"."first_name",
+         "auth_user"."last_name"
+FROM     "hospitapp_cita_turno" 
+INNER JOIN "hospitapp_cita_paciente"  ON "hospitapp_cita_turno"."id" = "hospitapp_cita_paciente"."id_hora_id" 
+INNER JOIN "auth_user"  ON "auth_user"."id" = "hospitapp_cita_paciente"."id_doctor_id" 
+
+
+Ejemplo de Query
+Datos.objects.filter(User_pk__id_paciente = id).values(«campos que quieres»)
+Datos.objects.filter(User_pk__id_paciente = id).values_list(«campos que quieres») 
+"""

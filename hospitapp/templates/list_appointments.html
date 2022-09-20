@@ -1,0 +1,58 @@
+{% extends 'home.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+{% comment %} <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css"> {% endcomment %}
+{% comment %} <script src="https://kit.fontawesome.com/920cab7a4b.js" crossorigin="anonymous"></script> {% endcomment %}
+<link rel="stylesheet" href="{% static '/css/fontawesome.css' %}">
+<script src="{% static '/js/920cab7a4b.js'%}" crossorigin="anonymous"></script>
+<script type="text/javascript" src="{% static '/js/jquery-3.6.0.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/moment.min.js' %}"></script>
+{% comment %} <script type="text/javascript" src="{% static '/js/tempusdominus-bootstrap-4.min.js' %}"></script> {% endcomment %}
+{% comment %} <link rel="stylesheet" href="{% static '/css/tempusdominus-bootstrap-4.min.css'%}"/> {% endcomment %}
+<link rel="stylesheet" href="{% static '/css/datepicker.min.css' %}" integrity="sha256-b88RdwbRJEzRx95nCuuva+hO5ExvXXnpX+78h8DjyOE=" crossorigin="anonymous" />
+  <script src="{% static '/js/datepicker.min.js' %}" integrity="sha256-/7FLTdzP6CfC1VBAj/rsp3Rinuuu9leMRGd354hvk0k=" crossorigin="anonymous"></script>
+
+<section id="RegisterAppointment" class="services">
+    <h5>Citas para {{paciente.first_name}}{{ paciente.last_name}}</h5>
+    {% if messages %}
+      <ul class = "messages">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <br/><br/><br/><br/>
+    <div class="container">
+        <h4> Registro de Citas </h4>
+        <div class="form-group">
+            <table class="table table-striped|table-responsive">
+            {% csrf_token %}                
+                <tr>
+                {% for dato in cita %}
+                <td>{{ dato.id_doctor__first_name }}  {{ dato.id_doctor__last_name }}</td>
+                <td>{{ dato.id_hora__hora }}</td>
+                <td>{{ dato.fecha_cita }}</td>
+                    {% comment %} {{ cita.as_table }} {% endcomment %}
+                {% endfor %}
+                <td><a href ="{% url 'home' %}"> ELIMINAR</a></td>
+                </tr>
+            
+            </table>
+        </div>
+        <div class="form-actions">
+            <a href="{% url 'home' %}" class="btn btn-warning" >REGRESAR</a>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(function () {
+      $("#id_fecha_cita").datepicker({
+        format:'dd/mm/yyyy',
+      });
+    });
+  </script>
+
+{% endblock %}
