@@ -15,33 +15,7 @@
   <script src="{% static '/js/datepicker.min.js' %}" integrity="sha256-/7FLTdzP6CfC1VBAj/rsp3Rinuuu9leMRGd354hvk0k=" crossorigin="anonymous"></script>
 
 <section id="RegisterAppointment" class="services">
-    <h5>Citas para {{paciente.first_name}}{{ paciente.last_name}}</h5>
-    {% if messages %}
-      <ul class = "messages">
-        {% for message in messages %}
-          <li class="{{ message.tags }}">{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-    <br/><br/><br/><br/>
-    <div class="container">
-        <h4> Citas de {{paciente.first_name}} {{paciente.last_name}}</h4>
-        <div class="form-group">
-            <table class="table table-striped|table-responsive">
-            {% csrf_token %}                
-                <tr>
-                {% if cita == None %}
-                <h6 align="center"> --  NO TIENE CITAS PROGRAMADAS -- </h6>
-                
-                {% else %}
-                {% for dato in cita %}
-                <td>{{ dato.id_doctor__first_name }}  {{ dato.id_doctor__last_name }}</td>
-                <td>{{ dato.id_hora__hora }}</td>
-                <td>{{ dato.fecha_cita }}</td>
-                    {% comment %} {{ cita.as_table }} {% endcomment %}
-                <td><a href ="{% url 'remove_appointment' dato.id  %}"> ELIMINAR</a></td>
-                {% endfor %}
-                {% endif %}
+    
                 </tr>
             
             </table>

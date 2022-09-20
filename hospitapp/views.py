@@ -253,13 +253,33 @@ def list_appointment(request, id):
         print("##### LAST NAME ####")
         print(user_last_name_get)
         #Genera un Diccionario
-        appointments = cita_paciente.objects.filter(id_paciente = id).values( 'id_doctor__first_name', 'id_doctor__last_name', 'id_hora__hora', 'fecha_cita')
+        appointments = cita_paciente.objects.filter(id_paciente = id).values( 'id_doctor__first_name', 'id_doctor__last_name', 'id_hora__hora', 'fecha_cita','id')
+        if not appointments:
+            print("VACIO")
+            appointments = None
+        else:
+            print("NO VACIO")
+            
         #Genera una Tupla
         #appointments = cita_paciente.objects.filter(id_paciente = id).values_list( 'id_doctor__first_name', 'id_doctor__last_name', 'id_hora__hora', 'fecha_cita')
         print("##### APPOINTMENT ####")
         print(appointments)
         paciente  = User.objects.get(pk = user_id)
     else:
+        return redirect('home')
+    return render(request,'list_appointments.html',{'cita':appointments, 'paciente': paciente})
+
+def remove_appointment(request, id):
+    if User.is_authenticated:
+        #Borramos la cita
+        record = cita_paciente.objects.get(pk = id )
+        record.delete()
+        paciente = record.id
+        appointments = cita_paciente.objects.filter(id_paciente = paciente).values( 'id_doctor__first_name', 'id_doctor__last_name', 'id_hora__hora', 'fecha_cita','id')
+        print(appointments)
+        paciente = User.objects.get(pk = id)
+    else:
+        print("no Borrada")
         return redirect('home')
     return render(request,'list_appointments.html',{'cita':appointments, 'paciente': paciente})
 
