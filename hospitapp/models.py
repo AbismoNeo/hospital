@@ -118,6 +118,8 @@ class cat_servicios(models.Model):
 #CATALOGO DE ETS (ENFERMEDADES DE TRANSMISION SEXUAL)
 class cat_ets (models.Model):
     Nombre = models.CharField(max_length=1000, verbose_name='Nombre de la ETS')
+    def __str__(self):
+        return self.Nombre
     class Meta:
         verbose_name = 'Enfermedades de Transmision Sexual (ETS)'
 
@@ -274,30 +276,30 @@ class antecedentes_ginecologicos(models.Model):
                         (('Moco cervical'),('Moco cervical')),
                         (('Lactancia materna'),('Lactancia materna'))
                             )
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.IntegerField(verbose_name='Usuario')
     menarquia = models.IntegerField(verbose_name='Edad Primera Mestruacion')
     ritmo= models.IntegerField(verbose_name='Dias aproximados entre cada Mestruacion')
-    FUM = models.DateField(auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultima Mestruacion')
+    FUM = models.DateField(auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultima Mestruacion', null = True, blank = True)
     Duracion = models.IntegerField(verbose_name='Dias aproximados que tarda la Mestruacion')
     Cant_Sangre = models.CharField(verbose_name = "Cantidad de Sangre", max_length= 100, choices=sangrado, default = "")
     frecuencia = models.CharField(verbose_name = "Frecuencia de Mestruacion", max_length= 50, choices=frec, default = "")
     dolor = models.BooleanField(verbose_name ='Presencia de Dolor en la Mestruacion')
     gestaciones = models.IntegerField(verbose_name='Numero de Gestaciones')
     partos = models.IntegerField(verbose_name='Numero de Partos')
-    fup = models.DateField( auto_now=False, verbose_name = 'Fecha de Ultimo Parto')
+    fup = models.DateField( auto_now=False, verbose_name = 'Fecha de Ultimo Parto', null = True, blank = True)
     abortos = models.IntegerField(verbose_name='Numero de Abortos')
-    fua = models.DateField( auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultimo Aborto')
+    fua = models.DateField( auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultimo Aborto',  null = True, blank = True)
     cesareas = models.IntegerField(verbose_name='Numero de Cesareas')
-    fuc = models.DateField( auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultima Cesarea')
-    fupapa = models.DateField( auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultimo Papanicolau')
-    ets = models.CharField(max_length=500, verbose_name='Enfermedades de Transmisión Sexual') #PEDIMOS PANTALLA Y GENERAMOS CADENA
+    fuc = models.DateField( auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultima Cesarea', null = True, blank = True)
+    fupapa = models.DateField( auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultimo Papanicolau',  null = True, blank = True)
+    ets = models.ManyToManyField(cat_ets)
     inicio_sexo = models.IntegerField(verbose_name='Edad de Inicio Sexual')
     frecuencia_sexo = models.IntegerField(verbose_name='Frecuencia de relaciones por semana')
     num_parejas = models.IntegerField(verbose_name='Numero de Parejas sexuales')
     metodo_anticonceptivo = models.CharField(verbose_name = "Metodos Anticonceptivos", max_length= 100, choices=anticonceptivos, default = "")
-    problemas_sexo = models.CharField(max_length=500, verbose_name='Problemas Sexuales')
+    problemas_sexo = models.CharField(max_length=500, verbose_name='Problemas Sexuales', null = True, blank = True)
     menopausia = models.BooleanField(verbose_name ='Ya presentó la menopausia')
-    edad_menopausia = models.IntegerField(verbose_name='Edad que tuvo la menopausia')
+    edad_menopausia = models.IntegerField(verbose_name='Edad que tuvo la menopausia',null = True, blank = True)
 
     class Meta:
         verbose_name = 'Antecedentes Ginecologicos de la paciente'

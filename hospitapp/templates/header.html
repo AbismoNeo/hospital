@@ -41,7 +41,9 @@
           <li class="dropdown"><a href="#"><span>Cuenta de {{paciente.first_name}}</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a class="nav-link scrollto" href="{% url 'user_profile' paciente.id %}">Perfil</a></li>
-              <li><a class="nav-link scrollto" href="{% url 'list_appointment' paciente.id %}">Citas Progrmadas</a></li>
+              <li><a class="nav-link scrollto" href="{% url 'register_medical_history' paciente.id %}">Antecedentes Clinicos</a></li>
+              <li><a class="nav-link scrollto" href="{% url 'register_gynecological_history' paciente.id %}">Antecedentes Ginecologicos</a></li>
+              <li><a class="nav-link scrollto" href="{% url 'list_appointment' paciente.id %}">Citas Programadas</a></li>
               <li><a class="nav-link scrollto" href="{% url 'logout' %}">Salir</a></li>
             </ul>
           </li>

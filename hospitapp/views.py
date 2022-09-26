@@ -1,14 +1,15 @@
 from distutils import errors
+from email import iterators
 from django.contrib.auth import get_user_model
 from re import TEMPLATE
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpResponseRedirect
 import os
 from django.conf import settings
-
-from hospitapp.models import cita_paciente, cita_turno, medical_staff
+from datetime import datetime
+from hospitapp.models import antecedentes_ginecologicos, antecedentes_medicos, cita_paciente, cita_turno, medical_staff
 from . import forms
-from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm
+from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm, AntecedentesForm, GinecologiaAntecedentesForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
@@ -232,7 +233,7 @@ def register_appointment(request,id):
             return redirect('home')
         except:
             print("errors")
-            #messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
+            messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
     else:
         cita = RegistroCitasForm(request.POST or None)
         paciente = User.objects.get(pk = id)
@@ -283,6 +284,78 @@ def remove_appointment(request, id):
         return redirect('home')
     return render(request,'list_appointments.html',{'cita':appointments, 'paciente': paciente})
 
+def register_medical_history(request,id):
+    if request.method == 'POST':
+        print("POST")
+        history = AntecedentesForm(request.POST or None)
+        usuario = User.objects.get(pk = history['user'].value())
+        historial = antecedentes_medicos.objects.create(
+        user = usuario,
+        cardiovasculares = history['cardiovasculares'].value(),
+        pulmonares = history['pulmonares'].value(),
+        digestivos = history['digestivos'].value(),
+        renales = history['renales'].value(),
+        quirurgicos = history['quirurgicos'].value(),
+        transfusiones = history['transfusiones'].value(),
+        alcoholismo = history['alcoholismo'].value(),
+        tabaquismo = history['tabaquismo'].value(),
+        drogas = history['drogas'].value(),
+        inmunizaciones = history['inmunizaciones'].value(),
+        padre_vivo = history['padre_vivo'].value(),
+        madre_vivo = history['madre_vivo'].value(),
+        hnos_Tiene = history['hnos_Tiene'].value(),
+        hnos_cuantos = history['hnos_cuantos'].value(),
+        enfermeades_padre = history['enfermeades_padre'].value(),
+        enfermeades_madre = history['enfermeades_madre'].value(),
+        enfermeades_hnos = history['enfermeades_hnos'].value(),
+        otras_anotaciones = history['otras_anotaciones'].value()
+                                                        )
+        try:
+            historial.save()
+            messages.success(request, 'La cita fue registrada correctamente.')
+            return redirect('home')
+        except:
+            messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
+    else:
+        history = AntecedentesForm(request.POST or None)
+        paciente = User.objects.get(pk = id)
+        history = AntecedentesForm(initial ={'user' : paciente.id})
+    paciente = User.objects.get(pk = id)
+    return render(request, 'register_medical_history.html',{'history':historial , 'paciente':paciente,})
+
+
+def register_gynecological_history(request,id):
+    if request.method == 'POST':
+        history = GinecologiaAntecedentesForm(request.POST or None)
+        #historial = antecedentes_ginecologicos(request.POST)
+        historial = GinecologiaAntecedentesForm(request.POST or None)
+        print(historial)
+        try:
+            antginec = historial
+            antginec.save(commit = False)
+            lista_ets = request.POST.getlist('ets')
+            # for listets in lista_ets:
+            #     print("add antes")
+            #     print(listets)
+            #     antginec.ets.add(listets)
+            #     print("add despues")
+            #historial.save()
+            antginec.save()
+            messages.success(request, 'La cita fue registrada correctamente.')
+            return redirect('home')
+        except Exception as inst:
+            # print(type(inst))    # the exception instance
+            # print(inst.args)     # arguments stored in .args
+            # print(inst)
+            # print(errors)
+            messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
+    else:
+        history = GinecologiaAntecedentesForm()
+        paciente = User.objects.get(pk = id)
+        history = GinecologiaAntecedentesForm(initial ={'user' : id}) #paciente.id
+        print(history)
+    paciente = User.objects.get(pk = id)
+    return render(request, 'register_gynecological_history.html',{'history':history , 'paciente':paciente,})
 
 """
 hora_cita
