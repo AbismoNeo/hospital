@@ -36,12 +36,16 @@ class cat_genero(models.Model):
     genero = models.CharField(max_length=50, verbose_name='Genero')
     class Meta:
         verbose_name = 'Catalogo de Generos'
+    def __str__(self):
+        return self.genero
 
 # CATALOGO DE PARENTESCOS
 class cat_parentesco(models.Model):
     parentesco = models.CharField(max_length=100, verbose_name='Parentesco')
     class Meta:
         verbose_name = 'Catalogo de Parentesco'
+    def __str__(self):
+        return self.parentesco
 
 # CATALOGO DE MEDICAMENTOS
 class cat_medicamentos(models.Model):
@@ -130,8 +134,10 @@ class cat_ets (models.Model):
 ###################################################################################
 ###################################################################################
 """
-
+################################
 # ABSTRACCION DE USUARIO
+################################
+
 class User(AbstractUser):
     rfc = models.CharField(max_length=13)
     es_paciente = models.BooleanField(default=False)
@@ -163,7 +169,10 @@ class medical_staff(models.Model):
         verbose_name = 'Perfil Personal Medico'
         verbose_name_plural = 'Perfiles de Personal Medico'
 
+################################
 # PERFIL DE LOS PACIENTES Y AFILIADOS
+################################
+
 class patients(models.Model):
     sexo=(("MASCULINO", "MASCULINO"), ("FEMENINO", "FEMENINO"))
     user= models.ForeignKey('User', on_delete=models.CASCADE)
@@ -181,7 +190,6 @@ class patients(models.Model):
     class Meta:
         verbose_name = 'Perfil Paciente'
         verbose_name_plural = 'Perfiles de Pacientes'
-
 
 """
 ###################################################################################
@@ -304,7 +312,6 @@ class antecedentes_ginecologicos(models.Model):
     class Meta:
         verbose_name = 'Antecedentes Ginecologicos de la paciente'
         verbose_name_plural = 'Antecedentes Ginecologicos de las pacientes'
-
 
 #FALTA LA TABLA OPERACION A REALIZAR:
 # orden, id_medico, tipo_operacion, sala_operacion, 
