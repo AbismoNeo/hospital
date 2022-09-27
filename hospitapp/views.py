@@ -7,9 +7,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 import os
 from django.conf import settings
 from datetime import datetime
-from hospitapp.models import antecedentes_ginecologicos, antecedentes_medicos, cita_paciente, cita_turno, medical_staff
+from hospitapp.models import antecedentes_ginecologicos, antecedentes_medicos, cita_paciente, cita_turno, medical_staff, patients
 from . import forms
-from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm, AntecedentesForm, GinecologiaAntecedentesForm
+from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm, AntecedentesForm, GinecologiaAntecedentesForm, PatientProfileForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
@@ -129,20 +129,17 @@ def faqs(request):
     }
     return render(request,'faqs.html',context)
 
-
 def services(request):
     context = {
         'Title':'Hospitapp - Servicios',
     }
     return render(request,'services.html',context)
 
-
 def specialties(request):
     context = {
         'Title':'Hospitapp - Especialidades',
     }
     return render(request,'specialties.html',context)
-
 
 def doctors(request):
     context = {
@@ -241,6 +238,33 @@ def register_appointment(request,id):
     paciente = User.objects.get(pk = id)
     return render(request, 'register_appointment.html',{'cita':cita , 'paciente':paciente,})
 
+################################
+#Perfil de Paciente
+################################
+
+def patient_profile(request,id):
+    if request.method == 'POST':
+        profile = PatientProfileForm(request.POST or None)
+        paciente = User.objects.get(pk = id)
+        #perfil = patients()
+        try:
+            perfil = profile
+            perfil.save()
+            messages.success(request, 'La cita fue registrada correctamente.')
+            return redirect('home')
+        except:
+            print("errors")
+            messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
+    else:
+        profile = PatientProfileForm(request.POST or None)
+        paciente = User.objects.get(pk = id)
+        profile = PatientProfileForm(initial ={'user' : paciente.id})
+    paciente = User.objects.get(pk = id)
+    return render(request, 'patient_profile.html',{'profile':profile , 'paciente':paciente,})
+
+################################
+#Lista de Citas
+################################
 
 def list_appointment(request, id):
     if User.is_authenticated:
@@ -270,6 +294,10 @@ def list_appointment(request, id):
         return redirect('home')
     return render(request,'list_appointments.html',{'cita':appointments, 'paciente': paciente})
 
+################################
+#Remover citas
+################################
+
 def remove_appointment(request, id):
     if User.is_authenticated:
         #Borramos la cita
@@ -283,6 +311,10 @@ def remove_appointment(request, id):
         print("no Borrada")
         return redirect('home')
     return render(request,'list_appointments.html',{'cita':appointments, 'paciente': paciente})
+
+################################
+#Registro de Antecedentes
+################################
 
 def register_medical_history(request,id):
     if request.method == 'POST':
@@ -323,13 +355,15 @@ def register_medical_history(request,id):
     paciente = User.objects.get(pk = id)
     return render(request, 'register_medical_history.html',{'history':historial , 'paciente':paciente,})
 
+################################
+#Registro Antecedentes Ginecologicos
+################################
 
 def register_gynecological_history(request,id):
     if request.method == 'POST':
         history = GinecologiaAntecedentesForm(request.POST or None)
         #historial = antecedentes_ginecologicos(request.POST)
         historial = GinecologiaAntecedentesForm(request.POST or None)
-        print(historial)
         try:
             antginec = historial
             antginec.save(commit = False)

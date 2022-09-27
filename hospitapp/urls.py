@@ -21,6 +21,7 @@ urlpatterns = [
     path('register_medical_history/<int:id>/', views.register_medical_history, name = 'register_medical_history'),
     path('register_gynecological_history/<int:id>/', views.register_gynecological_history, name = 'register_gynecological_history'),
     path('remove_appointment/<int:id>/', views.remove_appointment, name = 'remove_appointment'),
+    path('patient_profile/<int:id>/', views.patient_profile, name = 'patient_profile'),
     path('user_profile/<int:id>/', views.user_profile, name = 'user_profile'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

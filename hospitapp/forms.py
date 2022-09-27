@@ -6,7 +6,7 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.auth import get_user_model
 import datetime
-from hospitapp.models import cita_paciente, cita_turno, medical_staff,antecedentes_medicos, antecedentes_ginecologicos, cat_ets
+from hospitapp.models import cita_paciente, cita_turno, medical_staff,antecedentes_medicos, antecedentes_ginecologicos, cat_ets, patients, cat_parentesco, cat_genero
 from tempus_dominus.widgets import DatePicker
 #TimePicker, DateTimePicker
 
@@ -58,23 +58,48 @@ class PacienteRegisterForm(UserCreationForm):
         model = User
         fields = ('username', 'first_name', 'last_name','rfc','email', 'password1', 'password2',)
 
-class PatientProfile(forms.ModelForm):
+class PatientProfileForm(forms.ModelForm):
     user= forms.CharField(widget=forms.HiddenInput())
-    telefono = models.CharField(max_length=20, verbose_name='Telefono')
-    direccion = models.CharField(max_length=200, verbose_name='Direccion')
-    fecha_nac = models.DateField(verbose_name='Fecha de Nacimiento')
-    id_genero = models.ForeignKey('cat_genero', on_delete=models.CASCADE) #LGBTQ
-    id_sexo = models.CharField(verbose_name = "Sexo", max_length= 10, choices=sexo)
-    tipo_sangre = models.CharField(max_length=5, verbose_name='Tipo de Sangre')
-    derechohabiente = models.BooleanField(default = False, verbose_name='Derechohabiente')
-    afiliado = models.BooleanField(default = False, verbose_name='Afiliado' )
-    parentesco = models.ForeignKey('cat_parentesco', on_delete=models.CASCADE)
-    activo = models.BooleanField(default = True, verbose_name='Activo')
+    telefono = forms.CharField(
+                                label = 'Telefono',
+                                max_length=15, 
+                                min_length=10, 
+                                required=True, 
+                                widget=(forms.TextInput(attrs={'class': 'form-control'})))
+    direccion = forms.CharField(
+                                label = 'Dirección',
+                                max_length=200, 
+                                required=False,
+                                widget=(forms.Textarea(attrs={'class': 'form-control', 'name':'body', 'rows':3, 'cols':5 })))
+    fecha_nac = input_formats=['%d/%m/%Y %H:%M'] 
+    
+    id_genero = forms.ModelChoiceField(
+                            label='Genero', 
+                            queryset=cat_genero.objects.all()
+                            )
 
+    id_sexo = forms.ChoiceField(choices=patients.sexo, label = 'Sexo')
+    tipo_sangre = forms.CharField(
+                                label = 'Tipo de Sangre',
+                                max_length=5, 
+                                required=True,
+                                widget=(forms.TextInput(attrs={'class': 'form-control'})))
+    derechohabiente = forms.BooleanField(
+                                            label='¿Es Derechohabiente?',
+                                            widget =(forms.CheckboxInput(attrs={'style':'width:20px;height:20px;','null':'True', 'blank':'True'})))
+    afiliado = forms.BooleanField(
+                                            label='¿Es Afiliado?',
+                                            widget =(forms.CheckboxInput(attrs={'style':'width:20px;height:20px;','null':'True', 'blank':'True'})))
+    parentesco = forms.ModelChoiceField(
+                            label='Parentesco', 
+                            queryset=cat_parentesco.objects.all()
+                            )
+    activo = forms.BooleanField(
+                                            label='Activo',
+                                            widget =(forms.CheckboxInput(attrs={'style':'width:20px;height:20px;','null':'True', 'blank':'True'})))
     class Meta:
         model = patients
         fields = ('telefono','direccion', 'fecha_nac', 'id_genero', 'id_sexo', 'tipo_sangre', 'derechohabiente', 'afiliado', 'parentesco', 'activo')
-
 
 class LoginForm(forms.ModelForm):
     username = forms.CharField( 
@@ -92,10 +117,6 @@ class LoginForm(forms.ModelForm):
         super(LoginForm, self).__init__(*args, **kwargs)
         self.fields['username'].help_text = None
         self.fields['password'].help_text = None
-
-
-sql = 'SELECT hms.id, au.first_name, au.last_name FROM  hospitapp_medical_staff hms, auth_user au WHERE hms.user_id = au.id AND  au.es_doctor  = TRUE'
-qs = medical_staff.objects.raw (sql)
 
 class RegistroCitasForm(forms.ModelForm):
     
@@ -116,8 +137,6 @@ class RegistroCitasForm(forms.ModelForm):
         model = cita_paciente
         fields = ('fecha_cita', 'id_hora', 'id_doctor','id_paciente',)
     
-
-
 class ProfileForm(forms.ModelForm):
     username = forms.CharField( 
                                 label='Usuario',
@@ -369,5 +388,3 @@ class GinecologiaAntecedentesForm(forms.ModelForm):
                     'inicio_sexo',      'frecuencia_sexo',  'num_parejas',  'metodo_anticonceptivo','problemas_sexo',   'menopausia',   'edad_menopausia', 
                     
                 )
-
-    
