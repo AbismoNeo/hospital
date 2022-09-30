@@ -6,7 +6,7 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.auth import get_user_model
 import datetime
-from hospitapp.models import cita_paciente, cita_turno, medical_staff,antecedentes_medicos, antecedentes_ginecologicos, cat_ets, patients, cat_parentesco, cat_genero
+from hospitapp.models import cita_paciente, cita_turno, medical_staff,antecedentes_medicos, antecedentes_ginecologicos, cat_ets, patients, cat_parentesco, cat_genero, cat_especialidades, cat_escuelas, cat_medicamentos,alergies, operations_history, cat_operaciones, indicadores_pre
 from tempus_dominus.widgets import DatePicker
 #TimePicker, DateTimePicker
 
@@ -100,6 +100,45 @@ class PatientProfileForm(forms.ModelForm):
     class Meta:
         model = patients
         fields = ('telefono','direccion', 'fecha_nac', 'id_genero', 'id_sexo', 'tipo_sangre', 'derechohabiente', 'afiliado', 'parentesco', 'activo')
+
+class MedicalProfileForm(forms.ModelForm):
+    user= forms.CharField(widget=forms.HiddenInput())
+    telefono = forms.CharField(
+                                label = 'Telefono',
+                                max_length=15, 
+                                min_length=10,
+                                required=True,
+                                widget=(forms.TextInput(attrs={'class': 'form-control'})))
+
+    cedula_prof = forms.CharField(
+                                label = 'Cedula Profesional',
+                                max_length=15, 
+                                min_length=10,
+                                required=True,
+                                widget=(forms.TextInput(attrs={'class': 'form-control'})))
+
+    fecha_nac = input_formats=['%d/%m/%Y %H:%M'] 
+
+    id_especialidad = forms.ModelChoiceField(
+                            label='Especialidad', 
+                            queryset=cat_especialidades.objects.all()
+                            )
+
+    id_escuela = forms.ModelChoiceField(
+                            label='Universidad', 
+                            queryset=cat_escuelas.objects.all()
+                            )
+
+    modulo = forms.IntegerField(
+                                label ='Modulo de Consulta',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    activo = forms.BooleanField(
+                                label='Activo',
+                                widget =(forms.CheckboxInput(attrs={'style':'width:20px;height:20px;','null':'True', 'blank':'True'})))
+    class Meta:
+        model = medical_staff
+        fields = ('user', 'telefono', 'cedula_prof', 'fecha_nac', 'id_especialidad', 'id_escuela', 'modulo', 'activo')
 
 class LoginForm(forms.ModelForm):
     username = forms.CharField( 
@@ -388,3 +427,74 @@ class GinecologiaAntecedentesForm(forms.ModelForm):
                     'inicio_sexo',      'frecuencia_sexo',  'num_parejas',  'metodo_anticonceptivo','problemas_sexo',   'menopausia',   'edad_menopausia', 
                     
                 )
+
+class alergiesForm(forms.ModelForm):
+    user = forms.CharField(widget=forms.HiddenInput())
+    alergia_a = forms.ModelMultipleChoiceField(
+                                widget = forms.CheckboxSelectMultiple,
+                                label='Alergía a',
+                                queryset = cat_medicamentos.objects.all()
+                                )
+    class Meta:
+        model = alergies
+        fields = ( 'user', 'alergia_a')
+
+class operations_historyForm(forms.ModelForm):
+    user= forms.CharField(widget=forms.HiddenInput())
+    operacion_recibida = forms.ModelMultipleChoiceField(
+                                widget = forms.CheckboxSelectMultiple,
+                                queryset = cat_operaciones.objects.all()
+                                )
+    class Meta:
+        model = operations_history
+        fields = ( 'user', 'operacion_recibida')
+
+class indicators_preForm(forms.ModelForm):
+
+    paciente = forms.CharField(widget=forms.HiddenInput())
+    Fecha =  forms.DateField(widget=forms.HiddenInput())
+    Hora  = forms.TimeField(widget=forms.HiddenInput())
+
+    enfermera = forms.ModelChoiceField(
+                            label='Atendido por', 
+                            queryset=User.objects.filter(es_doctor = True) | User.objects.filter(es_enfermera = True))
+
+    peso = forms.FloatField(    label ='Peso en Kgs',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    talla = forms.FloatField(   label ='Talla en mts',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+    
+    imc = forms.FloatField(   label ='Indice de Masa Corporal (IMC)',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    circ_abdominal = forms.FloatField(   label ='Circunferencia Abdominal',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    presion = forms.FloatField(   label ='Presion Sanguinea',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    frec_cardiaca = forms.IntegerField(   label ='Frecuencia Cardiaca',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    frec_respiratoria  = forms.IntegerField(   label ='Frecuencia Respiratoria',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    temperatura = forms.FloatField(   label ='Temperatura en Grados °C',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    saturacion_o2  = forms.FloatField(   label ='Saturación de Oxigeno en %',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    glucemia_capilar = forms.FloatField(   label ='Glucemia Capilar',
+                                widget=(forms.NumberInput(attrs={'class': 'form-control'})))
+
+    nutricion = forms.ChoiceField(choices=indicadores_pre.estados_nutri, label = 'Estado Nutricional')
+
+    seguimiento_hospitalario = forms.BooleanField(
+                                            label='Segumiento Hospitalizado',
+                                            widget =(forms.CheckboxInput(attrs={'style':'width:20px;height:20px;','null':'True', 'blank':'True'})))
+
+    class Meta:
+        model = indicadores_pre
+        fields = ('__all__')  

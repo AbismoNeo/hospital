@@ -7,9 +7,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 import os
 from django.conf import settings
 from datetime import datetime
-from hospitapp.models import antecedentes_ginecologicos, antecedentes_medicos, cita_paciente, cita_turno, medical_staff, patients
+from hospitapp.models import antecedentes_ginecologicos, antecedentes_medicos, cat_medicamentos, cita_paciente, cita_turno, medical_staff, patients, alergies,operations_history, cat_operaciones, indicadores_pre
 from . import forms
-from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm, AntecedentesForm, GinecologiaAntecedentesForm, PatientProfileForm
+from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm, AntecedentesForm, GinecologiaAntecedentesForm, PatientProfileForm,MedicalProfileForm, alergiesForm, indicators_preForm, operations_historyForm, indicators_preForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
@@ -32,11 +32,12 @@ User = get_user_model()
 ################################
 
 def home(request):
-    username_get = request.user.username
-    user_id = request.user.id
-    print(username_get)
-    print(user_id)
+    
     if User.is_authenticated:
+        username_get = request.user.username
+        user_id = request.user.id
+        print(username_get)
+        print(user_id)
         print("autenticado")
         querybd = User.objects.get(pk = user_id)
         print(querybd.first_name)
@@ -263,6 +264,30 @@ def patient_profile(request,id):
     return render(request, 'patient_profile.html',{'profile':profile , 'paciente':paciente,})
 
 ################################
+#Perfil de Medico
+################################
+
+def medical_profile(request,id):
+    if request.method == 'POST':
+        profile = MedicalProfileForm(request.POST or None)
+        paciente = User.objects.get(pk = id)
+        if profile.is_valid:
+            try:
+                perfil = profile
+                perfil.save()
+                messages.success(request, 'La cita fue registrada correctamente.')
+                return redirect('home')
+            except:
+                print("errors")
+                messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
+    else:
+        profile = MedicalProfileForm(request.POST or None)
+        paciente = User.objects.get(pk = id)
+        profile = MedicalProfileForm(initial ={'user' : paciente.id})
+    paciente = User.objects.get(pk = id)
+    return render(request, 'medical_profile.html',{'profile':profile , 'paciente':paciente,})
+
+################################
 #Lista de Citas
 ################################
 
@@ -390,6 +415,84 @@ def register_gynecological_history(request,id):
         print(history)
     paciente = User.objects.get(pk = id)
     return render(request, 'register_gynecological_history.html',{'history':history , 'paciente':paciente,})
+
+################################
+#Registro Alergias del Paciente
+################################
+
+def alergies_patient(request,id):
+    if request.method == 'POST':
+        alergias = alergiesForm(request.POST or None)
+        try:
+            list_alergies = request.POST.getlist('alergia_a')
+            for alergie in list_alergies:
+                meds = cat_medicamentos.objects.get(pk = alergie)
+                item = alergies.objects.create(user = id, alergia_a = meds )
+            messages.success(request, 'La cita fue registrada correctamente.')
+            return redirect('home')
+        except Exception as inst:
+            messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
+    else:
+        alergias = alergiesForm(initial ={'user' : id}) #paciente.id
+    alergias_list = cat_medicamentos.objects.all()
+    paciente = User.objects.get(pk = id)
+    context = {
+                'alergies':alergias, 
+                'paciente':paciente,
+                'alergias':alergias_list,
+                }
+    return render(request, 'alergies_patient.html',context)
+
+
+################################
+#Registro Operaciones del Paciente (historial)
+################################
+
+def operations_history_patient(request,id):
+    if request.method == 'POST':
+        operations = operations_historyForm(request.POST or None)
+        try:
+            list_operations = request.POST.getlist('operacion_recibida')
+            for op in list_operations:
+                opers = cat_operaciones.objects.get(pk = op)
+                item = operations_history.objects.create(user = id, operacion_recibida = opers )
+            messages.success(request, 'La cita fue registrada correctamente.')
+            return redirect('home')
+        except Exception as inst:
+            messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
+    else:
+        operations = operations_historyForm(initial ={'user' : id}) #paciente.id
+    paciente = User.objects.get(pk = id)
+    operaciones = cat_operaciones.objects.all()
+    context = {
+                'operations':operations , 
+                'paciente':paciente,
+                'operaciones':operaciones,
+                }
+    return render(request, 'operations_history_patient.html',context)
+
+################################
+#Registro de indicadores Pre- Consulta
+################################
+
+def indicators_pre(request,id):
+    if request.method == 'POST':
+        indicators = indicators_preForm(request.POST or None)
+        try:
+            messages.success(request, 'La cita fue registrada correctamente.')
+            #return redirect('home')
+        except Exception as inst:
+            messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
+    else:
+        indicators = indicators_preForm(initial = {'paciente' : id})  #paciente.idrequest.POST or None)
+    paciente = User.objects.get(pk = id)
+    context = {
+                'indicators':indicators , 
+                'paciente':paciente,
+                }
+    return render(request, 'indicator_pre.html',context)
+
+
 
 """
 hora_cita

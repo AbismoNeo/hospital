@@ -22,6 +22,10 @@ urlpatterns = [
     path('register_gynecological_history/<int:id>/', views.register_gynecological_history, name = 'register_gynecological_history'),
     path('remove_appointment/<int:id>/', views.remove_appointment, name = 'remove_appointment'),
     path('patient_profile/<int:id>/', views.patient_profile, name = 'patient_profile'),
+    path('medical_profile/<int:id>/', views.medical_profile, name = 'medical_profile'),
     path('user_profile/<int:id>/', views.user_profile, name = 'user_profile'),
+    path('alergies_patient/<int:id>/', views.alergies_patient, name = 'alergies_patient'),
+    path('operations_history_patient/<int:id>/', views.operations_history_patient, name = 'operations_history_patient'),
+    path('indicators_pre/<int:id>/', views.indicators_pre, name = 'indicators_pre'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

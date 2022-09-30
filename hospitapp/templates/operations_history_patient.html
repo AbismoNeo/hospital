@@ -1,0 +1,128 @@
+{% extends 'home.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+{% comment %} <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css"> {% endcomment %}
+{% comment %} <script src="https://kit.fontawesome.com/920cab7a4b.js" crossorigin="anonymous"></script> {% endcomment %}
+<link rel="stylesheet" href="{% static '/css/fontawesome.css' %}">
+<script src="{% static '/js/920cab7a4b.js'%}" crossorigin="anonymous"></script>
+<script type="text/javascript" src="{% static '/js/jquery-3.6.0.js' %}"></script>
+<script type="text/javascript" src="{% static '/js/moment.min.js' %}"></script>
+<style type="text/css">
+    #myInput {
+        background-image: url('/css/searchicon.png'); /* Add a search icon to input */
+        background-position: 10px 12px; /* Position the search icon */
+        background-repeat: no-repeat; /* Do not repeat the icon image */
+        width: 100%; /* Full-width */
+        font-size: 16px; /* Increase font-size */
+        padding: 12px 20px 12px 40px; /* Add some padding */
+        border: 1px solid #ddd; /* Add a grey border */
+        margin-bottom: 12px; /* Add some space below the input */
+      }
+      
+      #myTable {
+        border-collapse: collapse; /* Collapse borders */
+        width: 100%; /* Full-width */
+        border: 1px solid #ddd; /* Add a grey border */
+        font-size: 18px; /* Increase font-size */
+      }
+      
+      #myTable th, #myTable td {
+        text-align: left; /* Left-align text */
+        padding: 12px; /* Add padding */
+      }
+      
+      #myTable tr {
+        /* Add a bottom border to all table rows */
+        border-bottom: 1px solid #ddd;
+      }
+      
+      #myTable tr.header, #myTable tr:hover {
+        /* Add a grey background color to the table header and on hover */
+        background-color: #f1f1f1;
+      }
+</style>
+{% comment %} <script type="text/javascript" src="{% static '/js/tempusdominus-bootstrap-4.min.js' %}"></script> {% endcomment %}
+{% comment %} <link rel="stylesheet" href="{% static '/css/tempusdominus-bootstrap-4.min.css'%}"/> {% endcomment %}
+<link rel="stylesheet" href="{% static '/css/datepicker.min.css' %}" integrity="sha256-b88RdwbRJEzRx95nCuuva+hO5ExvXXnpX+78h8DjyOE=" crossorigin="anonymous" />
+  <script src="{% static '/js/datepicker.min.js' %}" integrity="sha256-/7FLTdzP6CfC1VBAj/rsp3Rinuuu9leMRGd354hvk0k=" crossorigin="anonymous"></script>
+
+<section id="RegisterAppointment" class="services">
+    {% if messages %}
+      <ul class = "messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <br/><br/><br/><br/>
+    <div class="container">
+        <h4> Operaciones de {{paciente.first_name}} {{paciente.last_name}} </h4>
+        <hr/>
+        {% comment %} <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Buscar por nombre ..."> {% endcomment %}
+        {% comment %} <form method = "POST" autocomplete="off">
+        <div class="form-group">
+            <table class="table table-striped|table-responsive" id = "MyData">
+            {% csrf_token %}
+            {{ operations.as_table }}
+            </table>
+        </div>
+            <div class="form-actions">
+                <input name="register" id="" class="btn btn-primary" type="submit" value="REGISTRAR">
+                <a href="{% url 'home' %}" class="btn btn-warning" >CANCELAR</a>
+            </div>
+        </form> {% endcomment %}
+        {% comment %} NUEVA TABLA HECHA A MANO {% endcomment %}
+        
+        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Buscar por nombre ...">
+        <form method = "POST" autocomplete="off">
+        {% csrf_token %}
+        <table class="table table-striped|table-responsive" id = "MyData">
+        {% for item in operaciones %}
+            <tr><td><input type="checkbox" name="operacion_recibida" value="{{ forloop.counter }}" id="id_operacion_recibida_{{ forloop.counter0 }}"></td>
+                <td>{{ item }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        </div>
+        <div class="form-actions">
+            <input name="register" id="" class="btn btn-primary" type="submit" value="REGISTRAR">
+            <a href="{% url 'home' %}" class="btn btn-warning" >CANCELAR</a>
+        </div>
+        </form>
+    </div>
+</section>
+
+<script>
+    $(function () {
+        $("#id_fecha_nac").datepicker({
+        format:'dd/mm/yyyy',
+        });
+    });
+</script>
+<script>
+    function myFunction() {
+      // Declare variables
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("myInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("MyData");
+      tr = table.getElementsByTagName("tr");
+    
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+    </script>
+
+{% endblock %}

@@ -56,6 +56,10 @@ class cat_medicamentos(models.Model):
 
     class Meta:
         verbose_name = 'Catalogo de Medicamentos'
+    
+    def __str__(self):
+        return self.compuesto
+    
 
 #CATALOGO DE GRUPOS TERAPEUTICOS PARA MEDICAMENTOS
 class cat_grupos_terapeuticos (models.Model):
@@ -70,7 +74,10 @@ class cat_operaciones(models.Model):
     nivel = models.IntegerField(verbose_name='Nivel')
     class Meta:
         verbose_name = 'Catalogo de Operaciones'
-
+    
+    def __str__(self):
+        return self.operacion
+    
 
 #CATALOGO DE ANALISIS CLINICOS
 class cat_analisis(models.Model):
@@ -157,7 +164,7 @@ class User(AbstractUser):
     
 # PERFIL DEL PERSONAL MEDICO 
 class medical_staff(models.Model):
-    user= models.ForeignKey('User', on_delete=models.CASCADE)
+    user= models.IntegerField(verbose_name='id de Usuario')
     telefono = models.CharField(max_length=20, verbose_name='Telefono')
     cedula_prof = models.CharField(max_length=15, verbose_name='Cedula Profesional')
     fecha_nac = models.DateField(verbose_name='Fecha de Nacimiento')
@@ -175,7 +182,7 @@ class medical_staff(models.Model):
 
 class patients(models.Model):
     sexo=(("MASCULINO", "MASCULINO"), ("FEMENINO", "FEMENINO"))
-    user= models.ForeignKey('User', on_delete=models.CASCADE)
+    user= models.IntegerField(verbose_name='id de Usuario')
     telefono = models.CharField(max_length=20, verbose_name='Telefono')
     direccion = models.CharField(max_length=200, verbose_name='Direccion')
     fecha_nac = models.DateField(verbose_name='Fecha de Nacimiento')
@@ -196,17 +203,31 @@ class patients(models.Model):
                                 EXPEDIENTE CLINICO
 ###################################################################################
 """
+################################
 # ALERGIAS DE LOS PACIENTES A MEDICAMENTOS
+################################
+
 class alergies(models.Model):
-    user= models.ForeignKey('User', on_delete=models.CASCADE)
+    user= models.IntegerField(verbose_name='id de Usuario')
     alergia_a = models.ForeignKey('cat_medicamentos', on_delete=models.CASCADE,verbose_name='Alergia a')
     class Meta:
         verbose_name = 'Alergias del Paciente'
         verbose_name_plural = 'Alergias de los Pacientes'
 
-# OPERACIONES A LOS PACIENTES
+################################
+# ANTECEDENTES DE OPERACIONES DE LOS PACIENTES
+################################
+
+class operations_history(models.Model):
+    user= models.IntegerField(verbose_name='id de Usuario')
+    operacion_recibida = models.ForeignKey('cat_operaciones', on_delete=models.CASCADE,verbose_name='operacion recibida')
+    class Meta:
+        verbose_name = 'Antecedente de Operaciones del Paciente'
+        verbose_name_plural = 'Antecedentes de Operaciones de los Pacientes'
+
+# OPERACIONES A LOS PACIENTES (PROGRAMADAS)
 class operations(models.Model):
-    user= models.ForeignKey('User', on_delete=models.CASCADE)
+    user= models.IntegerField(verbose_name='id de Usuario')
     operacion_recibida = models.ForeignKey('cat_operaciones', on_delete=models.CASCADE,verbose_name='operacion recibida')
     medico_responsable = models.ForeignKey('medical_staff', on_delete=models.CASCADE)
     class Meta:
@@ -226,7 +247,9 @@ class analysis(models.Model):
                                 ANTECEDENTES
 ###################################################################################
 """
+################################
 # ANTECEDENTES QUE SE LE TOMAN AL PACIENTE POR PRIMERA VEZ
+################################
 class antecedentes_medicos(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     cardiovasculares = models.BooleanField(verbose_name ='Problemas Cardiacos')
@@ -251,7 +274,9 @@ class antecedentes_medicos(models.Model):
         verbose_name = 'Antecedentes del paciente'
         verbose_name_plural = 'Antecedentes de los pacientes'
 
+################################
 # ANTECEDENTES GINECOLOGICOS QUE SE LE TOMAN AL PACIENTE POR PRIMERA VEZ
+################################
 class antecedentes_ginecologicos(models.Model):
     sangrado = (('Eumenorrea - regla escasa','Eumenorrea - regla escasa'),
                 ('Hipermenorrea - reglas abundantes.','Hipermenorrea - reglas abundantes.'),
@@ -332,7 +357,7 @@ class indicadores_pre(models.Model):
                         ('Sobrepeso','Sobrepeso'),
                         ('Obesidad','Obesidad')
                         )
-    paciente = models.ForeignKey('User',on_delete=models.CASCADE,verbose_name='Paciente', related_name='Paciente')
+    paciente =  models.IntegerField(verbose_name='Paciente')
     Fecha =  models.DateField(auto_now=True, auto_now_add=False, verbose_name='Fecha')
     Hora  = models.TimeField(auto_now=True, auto_now_add=False, verbose_name ='Hora')
     enfermera = models.ForeignKey('User',on_delete=models.CASCADE,verbose_name='Enfermera',related_name='Enfermera')
