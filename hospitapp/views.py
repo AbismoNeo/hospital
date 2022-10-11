@@ -1,5 +1,7 @@
+from ctypes.wintypes import BOOLEAN
 from distutils import errors
 from email import iterators
+from tokenize import blank_re
 from django.contrib.auth import get_user_model
 from re import TEMPLATE
 from django.shortcuts import redirect, render
@@ -7,11 +9,12 @@ from django.http import HttpResponse, HttpResponseRedirect
 import os
 from django.conf import settings
 from datetime import datetime
-from hospitapp.models import antecedentes_ginecologicos, antecedentes_medicos, cat_medicamentos, cita_paciente, cita_turno, medical_staff, patients, alergies,operations_history, cat_operaciones, indicadores_pre
+from hospitapp.models import antecedentes_ginecologicos, antecedentes_medicos, cat_medicamentos, cita_paciente, cita_turno, medical_staff, patients, alergies,operations_history, cat_operaciones, indicadores_pre, cat_ets
 from . import forms
-from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm, AntecedentesForm, GinecologiaAntecedentesForm, PatientProfileForm,MedicalProfileForm, alergiesForm, indicators_preForm, operations_historyForm, indicators_preForm
+from .forms import LoginForm, PacienteRegisterForm, RegistroCitasForm, ProfileForm, AntecedentesForm, GinecologiaAntecedentesForm, PatientProfileForm,MedicalProfileForm, alergiesForm, indicators_preForm, operations_historyForm, indicators_preForm,search_patientsForm,appointment_doctorForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.core import serializers
 
 """"
 ####################### MODO - COMPLETO ######################
@@ -479,6 +482,7 @@ def indicators_pre(request,id):
     if request.method == 'POST':
         indicators = indicators_preForm(request.POST or None)
         try:
+            indicators.save()
             messages.success(request, 'La cita fue registrada correctamente.')
             #return redirect('home')
         except Exception as inst:
@@ -491,6 +495,145 @@ def indicators_pre(request,id):
                 'paciente':paciente,
                 }
     return render(request, 'indicator_pre.html',context)
+
+
+def search_patients(request,id):
+    if request.method == 'POST':
+        print("POST")
+        busqueda = search_patientsForm(request.POST or None)
+        print("## BUSQUEDA ##")
+        print(busqueda)
+        Paciente = busqueda['busqueda'].value()
+        print (" ## PACIENTE ##")
+        print(Paciente)
+        try:
+            print("TRY")
+            patients = (User.objects.filter(rfc__contains = Paciente)|User.objects.filter(first_name__contains = Paciente)|User.objects.filter(last_name__contains = Paciente))
+            print(patients)
+            contador = len(patients)
+            print("## CONTADOR ##")
+            print(contador)
+            messages.success(request, 'La cita fue registrada correctamente.')
+            #return redirect('home')
+        except Exception as inst:
+            print("EXCEPTION")
+            messages.error(request, 'La cita NO fue registrada, intente de nuevo.')
+    else:
+        print("NO POST")
+        busqueda = search_patientsForm()  #paciente.idrequest.POST or None)
+        contador = 0
+        patients=None
+    paciente = User.objects.get(pk = id)
+    context = { 'busqueda':busqueda,
+                'patients':patients, 
+                'paciente':paciente,
+                'contador':contador,
+                }
+    return render(request, 'search_patients.html',context)
+
+
+def appointment_doctor(request, id):
+    if request.method =='POST':
+        appointment = appointment_doctorForm(request.POST)
+    else:
+        appointment = appointment_doctorForm()
+        user_id = id
+        paciente_data = User.objects.get(pk = id)
+        appointment = appointment_doctorForm(request.POST)
+        patient = patients.objects.filter(user = paciente_data.id).values("id_sexo")
+        for pat in patient:
+            sex = pat['id_sexo']        
+        if sex == "FEMENINO": 
+            sexo = 'MUJER'
+        else:
+            sexo = 'HOMBRE'
+        hoy = datetime.today().strftime("%d-%m-%Y")
+        indicadores = indicadores_pre.objects.get(paciente = paciente_data.id)
+        indicators = indicators_preForm(request.POST or None, instance = indicadores)
+        indicadores_dict = {}
+        for objeto in indicators:
+            if type(objeto.value()) == bool:
+                vale = objeto.value()
+                if vale:
+                    valor = 'SI'
+                    indicadores_dict.setdefault(objeto.label , valor)
+                else:
+                    valor = 'NO'
+                    indicadores_dict.setdefault(objeto.label , valor)
+            else:
+                #print(objeto.label)
+                if objeto.label == 'Paciente':
+                    print("PACIENTE")
+                elif objeto.label =='Hora':
+                    print("HORA")
+                else:
+                    valor = objeto.value()
+                    indicadores_dict.setdefault(objeto.label , valor)
+        expediente = antecedentes_medicos.objects.get(user_id = paciente_data.id)
+        history = AntecedentesForm(request.POST or None, instance = expediente)
+        expediente_dict = {}
+        for objeto in history:
+            if type(objeto.value()) == bool:
+                vale = objeto.value()
+                if vale:
+                    valor = 'SI'
+                else:
+                    valor = 'NO'
+            else:
+                valor = objeto.value()
+            expediente_dict.setdefault(objeto.label , valor)
+        alergias= alergies.objects.filter(user = paciente_data.id ).values('alergia_a__compuesto') #se enlaza a compuesto 
+        operaciones = operations_history.objects.filter(user = paciente_data.id).values('operacion_recibida__operacion')        
+        if sexo == 'MUJER':
+            ginecologicos= antecedentes_ginecologicos.objects.get(user = paciente_data.id)
+            history_gin = GinecologiaAntecedentesForm(request.POST or None, instance = ginecologicos)
+            ginecologicos_dict ={}
+            for objeto in history_gin:
+                if type(objeto.value()) == bool:
+                    vale = objeto.value()
+                    if vale:
+                        valor = 'SI'
+                    else:
+                        valor = 'NO'
+                elif objeto.label == 'User':
+                    print("-")
+                elif objeto.label == 'Enfermedades de Transimisión Sexual':
+                    ets_user = objeto.value()
+                else:
+                    if objeto.value() is None:
+                        print(objeto.label)
+                        print("NONE")
+                        valor = " "
+                        ginecologicos_dict.setdefault(objeto.label , valor)
+                    else:
+                        valor = objeto.value()
+                        ginecologicos_dict.setdefault(objeto.label , valor)
+            #ets_user = ginecologicos.get_list('ets')
+            ets_dict = []
+            for ets in ets_user:
+                query_ets = cat_ets.objects.get(pk = ets)
+                nombre = query_ets.Nombre
+                ets_dict.append(nombre)
+            print(ets_dict)
+        else:
+            ginecologicos=None
+            ets_user = None
+
+    paciente_data = User.objects.get(pk = paciente_data.id)
+    context ={  'appointment' : appointment,
+                'paciente':paciente_data,
+                'id': id,
+                'patient_sex': patient,
+                'sexo':sexo,
+                'indicadores':indicadores_dict,
+                'expediente':expediente_dict,
+                'alergias':alergias,
+                'operaciones':operaciones,
+                'ginecologicos':ginecologicos_dict,
+                'ets': ets_dict,
+
+            }
+    return render(request, 'appointment_doctor.html', context)
 
 
 
@@ -510,4 +653,7 @@ INNER JOIN "auth_user"  ON "auth_user"."id" = "hospitapp_cita_paciente"."id_doct
 Ejemplo de Query
 Datos.objects.filter(User_pk__id_paciente = id).values(«campos que quieres»)
 Datos.objects.filter(User_pk__id_paciente = id).values_list(«campos que quieres») 
+
+
+variable = modelobase.objects.filter(user = paciente.id).values('campo_relacion__nombre_campo_dato_necesario')
 """

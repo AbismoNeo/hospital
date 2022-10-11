@@ -41,6 +41,8 @@
           <li class="dropdown"><a href="#"><span>Cuenta de {{paciente.first_name}}</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a class="nav-link scrollto" href="{% url 'user_profile' paciente.id %}">Perfil de Usuario</a></li>
+              <li><a class="nav-link scrollto" href="{% url 'appointment_doctor' paciente.id %}">Consulta</a></li>
+              <li><a class="nav-link scrollto" href="{% url 'search_patients' paciente.id %}">Buscar Pacientes</a></li>
               <li><a class="nav-link scrollto" href="{% url 'indicators_pre' paciente.id %}">indicadores Pre-Consulta</a></li>
               <li><a class="nav-link scrollto" href="{% url 'alergies_patient' paciente.id %}">Alergias del Paciente</a></li>
               <li><a class="nav-link scrollto" href="{% url 'operations_history_patient' paciente.id %}">Operaciones Anteriores del Paciente</a></li>

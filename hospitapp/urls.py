@@ -27,5 +27,8 @@ urlpatterns = [
     path('alergies_patient/<int:id>/', views.alergies_patient, name = 'alergies_patient'),
     path('operations_history_patient/<int:id>/', views.operations_history_patient, name = 'operations_history_patient'),
     path('indicators_pre/<int:id>/', views.indicators_pre, name = 'indicators_pre'),
+    path('search_patients/<int:id>/', views.search_patients, name = 'search_patients'),
+    path('appointment_doctor/<int:id>/', views.appointment_doctor, name = 'appointment_doctor'),
+    
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

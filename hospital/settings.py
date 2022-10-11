@@ -142,6 +142,14 @@ LOGIN_REDIRECT_URL ='home'
 
 LOGOUT_REDIRECT_URL = 'home'
 
+
+#DATE_INPUT_FORMATS = ['%d-%m-%Y']
+
+DATE_FORMAT = ['%d/%m/%Y']
+
+DATE_INPUT_FORMATS = ['%d/%m/%Y']
+
+
 # Tempus Dominus - Date Picker settings
 
 # TEMPUS_DOMINUS_LOCALIZE = True

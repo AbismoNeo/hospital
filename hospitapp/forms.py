@@ -6,7 +6,7 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.auth import get_user_model
 import datetime
-from hospitapp.models import cita_paciente, cita_turno, medical_staff,antecedentes_medicos, antecedentes_ginecologicos, cat_ets, patients, cat_parentesco, cat_genero, cat_especialidades, cat_escuelas, cat_medicamentos,alergies, operations_history, cat_operaciones, indicadores_pre
+from hospitapp.models import cita_paciente, cita_turno, medical_staff,antecedentes_medicos, antecedentes_ginecologicos, cat_ets, patients, cat_parentesco, cat_genero, cat_especialidades, cat_escuelas, cat_medicamentos,alergies, operations_history, cat_operaciones, indicadores_pre, cat_enfermedades, consulta
 from tempus_dominus.widgets import DatePicker
 #TimePicker, DateTimePicker
 
@@ -498,3 +498,102 @@ class indicators_preForm(forms.ModelForm):
     class Meta:
         model = indicadores_pre
         fields = ('__all__')  
+
+class search_patientsForm(forms.Form):
+    busqueda = forms.CharField(
+                                max_length=200, 
+                                required=False,
+                                widget=(forms.TextInput(attrs={'class': 'form-control'})))
+    class Meta:
+        fields = ['busqueda', ]
+        labels = { "busqueda" : "" }
+datenow = datetime.datetime.now()
+class appointment_doctorForm(forms.ModelForm):
+    id_paciente = forms.CharField(widget=forms.HiddenInput())
+    id_medico = forms.CharField(widget=forms.HiddenInput())
+    urgencia = forms.BooleanField(
+                                    label='Consulta Urgencia',
+                                    widget =(forms.CheckboxInput(attrs={'style':'width:20px;height:20px;','null':'True', 'blank':'True'})))
+    fecha =  forms.DateField(widget=forms.HiddenInput())
+    hora  = forms.TimeField(widget=forms.HiddenInput())
+    
+    id_indicadores = forms.ModelChoiceField(
+                            label='Indicadores del  día:', 
+                            queryset=indicadores_pre.objects.filter(Fecha = datenow).filter(paciente = 2)
+                            )
+#    id_indicadores = models.ForeignKey('indicadores_pre', verbose_name=("Indicadores"), on_delete=models.CASCADE) 
+
+    presentacion = forms.CharField(
+                                label = 'Presentacion del Paciente',
+                                max_length=1000, 
+                                required=False,
+                                #help_text ='Corroborar que es el paciente' ,
+                                widget=(forms.Textarea(attrs={'class': 'form-control', 'name':'body', 'rows':5,})))
+    #SOAP
+    subjetivo = forms.CharField(
+                                label = 'Subjetivo del Paciente',
+                                max_length=1000, 
+                                required=False,
+                                #help_text ='Lo que dice el paciente' ,
+                                widget=(forms.Textarea(attrs={'class': 'form-control', 'name':'body', 'rows':5, })))
+    
+    objetivo = forms.CharField(
+                                label = 'Objetivo del Paciente',
+                                max_length=1000, 
+                                required=False,
+                                #help_text ='Lo que se ve en el paciente' ,
+                                widget=(forms.Textarea(attrs={'class': 'form-control', 'name':'body', 'rows':5,})))
+    
+    evaluacion = objetivo = forms.CharField(
+                                label = 'Evaluacion del Paciente',
+                                max_length=1000, 
+                                required=False,
+                                #help_text ='Lo que el medico cree tiene el paciente' ,
+                                widget=(forms.Textarea(attrs={'class': 'form-control', 'name':'body', 'rows':5,})))
+    
+    plan = objetivo = forms.CharField(
+                                label = 'Plan para el Paciente',
+                                max_length=1000, 
+                                required=False,
+                                #help_text ='Lo que se hara con el paciente' ,
+                                widget=(forms.Textarea(attrs={'class': 'form-control', 'name':'body', 'rows':5,})))
+    
+    #SOAP
+    
+    pronostico = objetivo = forms.CharField(
+                                label = 'Pronostico del Paciente',
+                                max_length=1000, 
+                                required=False,
+                                #help_text ='Se espera el regreso o no del paciente' ,
+                                widget=(forms.Textarea(attrs={'class': 'form-control', 'name':'body', 'rows':5,'data-toggle':"tooltip", 'title':"Se espera o no el regreso pronto del paciente."})))
+    
+    tratamiento_no_farm = forms.CharField(
+                                label = 'indicaciones',
+                                max_length=2000, 
+                                required=False,
+                                #help_text ='Tratamiento no farmacologico' ,
+                                widget=(forms.Textarea(attrs={'class': 'form-control', 'name':'body', 'rows':5, 'data-toggle':"tooltip", 'title':"Indicaciones no farmacologicas a seguir por el paciente"})))
+    
+    id_enfermedad  = forms.ModelChoiceField(
+                            label='Enfermedad:', 
+                            widget=forms.Select(attrs={'data-toggle':"tooltip", 'title':"Enfermedad posiblemente detectada al paciente",'font-size':'28px','wordwrap':'True' }),
+                            queryset=cat_enfermedades.objects.all()
+                                            )
+
+    hospitalizacion = forms.BooleanField(
+                                    label='Hospitalizar',
+                                    widget =(forms.CheckboxInput(attrs={'style':'width:20px;height:20px;','null':'True', 'blank':'True', 'data-toggle':"tooltip", 'title':"¿Se debe hospitalizar?"})))
+
+    programado = forms.BooleanField(
+                                    label='Hospitalización Programada',
+                                    widget =(forms.CheckboxInput(attrs={'style':'width:20px;height:20px;','null':'True', 'blank':'True', 'data-toggle':"tooltip", 'title':"¿Tenía una hospitaliacion programada?"})))
+    
+    nota_medica_hospitalizado = forms.BooleanField(
+                                    label='Nota Medica',
+                                    widget =(forms.CheckboxInput(attrs={'style':'width:20px;height:20px;','null':'True', 'blank':'True', 'data-toggle':"tooltip", 'title':"¿Es una nota medica?"})))
+    #si se hospitaliza usa receta a fuerzas
+    receta = id_paciente = forms.BooleanField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = consulta
+        fields = '__all__'

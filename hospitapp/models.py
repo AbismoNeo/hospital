@@ -95,7 +95,9 @@ class cat_enfermedades(models.Model):
     capitulo = models.ForeignKey('cat_capitulos_enfermedades', on_delete=models.CASCADE)
     class Meta:
         verbose_name = 'Catalogo de Enfermedades'
-
+    def __str__(self):
+        return self.clave+' - '+self.nombre
+    
 #CATALOGO DE CAPITULOS PARA ENFERMEDADES
 class cat_capitulos_enfermedades(models.Model):
     capitulo = models.CharField(max_length=100, verbose_name='Capitulo de Enfermedad')
@@ -167,7 +169,7 @@ class medical_staff(models.Model):
     user= models.IntegerField(verbose_name='id de Usuario')
     telefono = models.CharField(max_length=20, verbose_name='Telefono')
     cedula_prof = models.CharField(max_length=15, verbose_name='Cedula Profesional')
-    fecha_nac = models.DateField(verbose_name='Fecha de Nacimiento')
+    fecha_nac =  models.CharField(verbose_name = 'Fecha de nacimiento', max_length=10)
     id_especialidad = models.ForeignKey('cat_especialidades', on_delete=models.CASCADE, verbose_name='Especialidad')
     id_escuela = models.ForeignKey('cat_escuelas', on_delete=models.CASCADE, verbose_name='Universidad')
     modulo = models.IntegerField(verbose_name='Modulo donde da consulta')
@@ -185,7 +187,7 @@ class patients(models.Model):
     user= models.IntegerField(verbose_name='id de Usuario')
     telefono = models.CharField(max_length=20, verbose_name='Telefono')
     direccion = models.CharField(max_length=200, verbose_name='Direccion')
-    fecha_nac = models.DateField(verbose_name='Fecha de Nacimiento')
+    fecha_nac =  models.CharField(verbose_name = 'Fecha de nacimiento', max_length=10)
     id_genero = models.ForeignKey('cat_genero', on_delete=models.CASCADE) #LGBTQ
     id_sexo = models.CharField(verbose_name = "Sexo", max_length= 10, choices=sexo)
     tipo_sangre = models.CharField(max_length=5, verbose_name='Tipo de Sangre')
@@ -312,19 +314,19 @@ class antecedentes_ginecologicos(models.Model):
     user = models.IntegerField(verbose_name='Usuario')
     menarquia = models.IntegerField(verbose_name='Edad Primera Mestruacion')
     ritmo= models.IntegerField(verbose_name='Dias aproximados entre cada Mestruacion')
-    FUM = models.DateField(auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultima Mestruacion', null = True, blank = True)
+    FUM =  models.CharField(verbose_name = 'Fecha de Ultima Mestruacion', null = True, blank = True, max_length=10)
     Duracion = models.IntegerField(verbose_name='Dias aproximados que tarda la Mestruacion')
     Cant_Sangre = models.CharField(verbose_name = "Cantidad de Sangre", max_length= 100, choices=sangrado, default = "")
     frecuencia = models.CharField(verbose_name = "Frecuencia de Mestruacion", max_length= 50, choices=frec, default = "")
     dolor = models.BooleanField(verbose_name ='Presencia de Dolor en la Mestruacion')
     gestaciones = models.IntegerField(verbose_name='Numero de Gestaciones')
     partos = models.IntegerField(verbose_name='Numero de Partos')
-    fup = models.DateField( auto_now=False, verbose_name = 'Fecha de Ultimo Parto', null = True, blank = True)
+    fup = models.CharField(verbose_name = 'Fecha de Ultimo Parto', null = True, blank = True, max_length=10)
     abortos = models.IntegerField(verbose_name='Numero de Abortos')
-    fua = models.DateField( auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultimo Aborto',  null = True, blank = True)
+    fua = models.CharField(verbose_name = 'Fecha de Ultimo Aborto', null = True, blank = True, max_length=10)
     cesareas = models.IntegerField(verbose_name='Numero de Cesareas')
-    fuc = models.DateField( auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultima Cesarea', null = True, blank = True)
-    fupapa = models.DateField( auto_now=False, auto_now_add=False, verbose_name = 'Fecha de Ultimo Papanicolau',  null = True, blank = True)
+    fuc = models.CharField(verbose_name = 'Fecha de Ultima Cesárea', null = True, blank = True, max_length=10)
+    fupapa = models.CharField(verbose_name = 'Fecha de Ultimo Papanicolau', null = True, blank = True, max_length=10)
     ets = models.ManyToManyField(cat_ets)
     inicio_sexo = models.IntegerField(verbose_name='Edad de Inicio Sexual')
     frecuencia_sexo = models.IntegerField(verbose_name='Frecuencia de relaciones por semana')
@@ -358,7 +360,7 @@ class indicadores_pre(models.Model):
                         ('Obesidad','Obesidad')
                         )
     paciente =  models.IntegerField(verbose_name='Paciente')
-    Fecha =  models.DateField(auto_now=True, auto_now_add=False, verbose_name='Fecha')
+    Fecha =  models.CharField(verbose_name = 'Fecha', max_length=10)
     Hora  = models.TimeField(auto_now=True, auto_now_add=False, verbose_name ='Hora')
     enfermera = models.ForeignKey('User',on_delete=models.CASCADE,verbose_name='Enfermera',related_name='Enfermera')
     peso = models.FloatField(verbose_name ='Peso en kgs')
@@ -379,10 +381,10 @@ class indicadores_pre(models.Model):
 
 # DATOS QUE SE TOMAN AL PASAR EL PACIENTE A CONSULTA CON SU MEDICO
 class consulta(models.Model):
-    id_paciente = models.ForeignKey('patients', verbose_name=("Paciente"), on_delete=models.CASCADE)
+    id_paciente = models.IntegerField(verbose_name='Paciente')
     id_medico = models.ForeignKey('medical_staff', verbose_name=("Medico"), on_delete=models.CASCADE)
     urgencia = models.BooleanField(verbose_name='Es consulta de Urgencias', default=False)
-    fecha = models.DateField( auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
     id_indicadores = models.ForeignKey('indicadores_pre', verbose_name=("Indicadores"), on_delete=models.CASCADE) 
     presentacion = models.CharField(max_length=1000, verbose_name='Presentacion del Paciente', help_text='Corroborar que es el paciente')
@@ -432,7 +434,7 @@ class receta(models.Model):
 # HOSPITALIZACION EN CASO DE SER NECESARIO
 class hospitalizacion(models.Model):
     paciente = models.ForeignKey("patients", on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha Ingreso')
+    fecha = models.CharField(verbose_name = 'Fecha Ingreso', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora Ingreso')
     motivo = models.ForeignKey("cat_hospitalizaciones", on_delete=models.CASCADE,verbose_name='Motivo') 
     consulta_referencia = models.ForeignKey("consulta", on_delete=models.CASCADE, related_name='consulta_referencia')
@@ -494,7 +496,7 @@ class seguimiento (models.Model):
     estudios = models.BooleanField(verbose_name='Estudios', default =False)
     #SI ES SI, LISTAR LOS DEL DIA ORDENADOS POR LA  HORA
     otros = models.CharField(max_length=500, verbose_name='Otras Indicaciones')
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
 
 #NOTA MEDICA (HECHA POR EL MEDICO)
@@ -502,7 +504,7 @@ class nota_medica(models.Model):
     id_paciente = models.ForeignKey('patients', verbose_name=("Paciente"), on_delete=models.CASCADE)
     id_hospitalizacion = models.ForeignKey("hospitalizacion", on_delete=models.CASCADE)
     id_consulta = models.ForeignKey("consulta", on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
 
 #SU RESPECTIVA ALTA
@@ -532,7 +534,7 @@ class alta_hospitalizacion(models.Model):
     indicaciones_indicadores = models.CharField(max_length=1000, verbose_name='Instrucciones para tomar los inicadores')
     sintomas_peligro = models.CharField(max_length=1000, verbose_name='Sintomas de Riesgo')
     cita_seguimiento = models.CharField(max_length=100, verbose_name='Cita para Seguimiento')
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha',max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
     #receta medicamentos
 
@@ -544,7 +546,7 @@ class solicitud_laboratorio (models.Model):
     urgencia = models.BooleanField(verbose_name='Urgencia', default =False)
     hospitalizado =  models.BooleanField(verbose_name='Hospitalizado', default =False)
     id_hospitalizacion = models.ForeignKey("hospitalizacion", on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
     atendido = models.BooleanField(verbose_name='atendido', default =False)
 
@@ -555,7 +557,7 @@ class resultados_laboratorio (models.Model):
     texto_descriptivo = models.CharField( max_length=2000, verbose_name=("Descripcion"))
     mediciones = models.CharField( max_length=5000, verbose_name=("Resultados"))
     medical_staff_lab  = models.ForeignKey('medical_staff', verbose_name=("Medico Elaboró"), on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
 
     # ESPECIALISTA EN CASO DE SER NECESARIO
@@ -566,7 +568,7 @@ class solicitud_especialista (models.Model):
     urgencia = models.BooleanField(verbose_name='Urgencia', default =False)
     hospitalizado =  models.BooleanField(verbose_name='Hospitalizado', default =False)
     id_hospitalizacion = models.ForeignKey("hospitalizacion", on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
     atendido = models.BooleanField(verbose_name='atendido', default =False)
 
@@ -578,7 +580,7 @@ class solicitud_estudios (models.Model):
     urgencia = models.BooleanField(verbose_name='Urgencia', default =False)
     hospitalizado =  models.BooleanField(verbose_name='Hospitalizado', default =False)
     id_hospitalizacion = models.ForeignKey("hospitalizacion", on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
     atendido = models.BooleanField(verbose_name='atendido', default =False)
 
@@ -589,7 +591,7 @@ class resultados_estudios (models.Model):
     texto_descriptivo = models.CharField( max_length=2000, verbose_name=("Descripcion"))
     mediciones = models.CharField( max_length=5000, verbose_name=("Resultados"))
     medical_staff_lab  = models.ForeignKey('medical_staff', verbose_name=("Medico Elaboró"), on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
 
 # SOLICITUD DE OPERACION
@@ -598,10 +600,10 @@ class solicitud_operacion (models.Model):
     medico_solicita = models.ForeignKey('medical_staff', verbose_name=("Medico solicitante"), on_delete=models.CASCADE)
     tipo_estudio = models.ForeignKey('cat_operaciones', verbose_name=("Estudio solicitado"), on_delete=models.CASCADE, limit_choices_to={'nivel':3} )  
     urgencia = models.BooleanField(verbose_name='Urgencia', default =False)
-    fecha_programada = models.DateField(auto_now=True, verbose_name='Fecha Programada')
+    fecha_programada = models.CharField(verbose_name = 'Fecha Programada', max_length=10)
     hospitalizado =  models.BooleanField(verbose_name='Hospitalizado', default =False)
     id_hospitalizacion = models.ForeignKey("hospitalizacion", on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
     atendido = models.BooleanField(verbose_name='atendido', default =False)
 
@@ -632,7 +634,7 @@ class material_areas (models.Model):
     
 #ATENCION ENFERMERIA
 class atencion_enfermeria(models.Model):
-    fecha = models.DateField( auto_now=True, verbose_name='Fecha')
+    fecha = models.CharField(verbose_name = 'Fecha', max_length=10)
     hora = models.TimeField(auto_now=True, verbose_name='Hora')
     id_paciente = models.ForeignKey('patients', on_delete=models.CASCADE, verbose_name = "Paciente")
     enfermera = models.ForeignKey('medical_staff', on_delete=models.CASCADE, verbose_name="Enfermera")
@@ -667,20 +669,20 @@ class farmacia(models.Model):
     id_medicamento = models.ForeignKey('cat_medicamentos', verbose_name=("Medicamento"), on_delete=models.CASCADE)
     cantidad = models.IntegerField(verbose_name="Cantidad")
     Lote = models.CharField(verbose_name = 'Lote', max_length= 15)
-    Fecha_caducidad = models.DateField(auto_now=False, auto_now_add=False, verbose_name = "Fecha de caducidad")
+    Fecha_caducidad =  models.CharField(verbose_name = 'Fecha de caducidad', max_length=10)
 
 # SURTIR RECETAS
 class surtir_recetas(models.Model):
     receta = receta
     farmacia = farmacia
     cantidad = models.IntegerField(verbose_name="Cantidad")
-    fecha_surtido = models.DateField(auto_now=True, auto_now_add=False, verbose_name = "Fecha")
+    fecha_surtido =  models.CharField(verbose_name = 'Fecha', max_length=10)
     hora_surtido = models.TimeField(auto_now=True, auto_now_add=False, verbose_name = 'Hora')
     
 #AGENDAR CITAS
 class cita_paciente (models.Model):
     id_paciente = models.ForeignKey('User', verbose_name=("Paciente"), related_name="Paciente_Cita", on_delete=models.CASCADE)
-    fecha_cita = models.DateField(auto_now=False, auto_now_add=False, verbose_name = "Fecha de la cita")
+    fecha_cita =  models.CharField(verbose_name = 'Fecha de la cita', max_length=10)
     id_hora = models.ForeignKey('cita_turno', on_delete = models.CASCADE, verbose_name = "Hora de la Cita")
     id_doctor = models.ForeignKey('User', verbose_name=("Doctor/Especialista"), related_name ="Doctor_Cita", on_delete=models.CASCADE)
 
@@ -705,7 +707,7 @@ class mensajero(models.Model):
     destinatario = models.ForeignKey('User',on_delete=models.CASCADE, verbose_name='DESTINO',related_name='Destinatario')
     titulo = models.CharField(max_length=100, verbose_name='ASUNTO')
     mensaje = models.CharField(max_length=1000, verbose_name='MENSAJE')
-    enviado = models.DateTimeField(auto_now = True)
+    enviado =  models.CharField(verbose_name = 'Fecha', max_length=10)
     leido = models.BooleanField(verbose_name='Leido',default = False)
 
     #se agrega esto para filtrar los datos de operaciones y otros estudios   limit_choices_to = { 'nivel': 1 }

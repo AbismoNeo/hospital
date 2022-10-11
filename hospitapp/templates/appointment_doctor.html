@@ -1,0 +1,133 @@
+{% extends 'home.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<style>
+    .position-fixed {
+        margin-left:50%;
+        left:-400;
+        margin-top:30%;
+        top:-300;
+        float: center;
+        width: 800px;
+        height: 500px;
+        border: 3px solid #090;
+        background-color: #ffffff;
+        overflow-y: scroll;
+        }
+</style>
+
+<section id="RegisterPatient" class="services">
+    <br/><br/><br/><br/>
+    <div class="container">
+        <h4> Consulta Médica: </h4>
+        <hr/>
+        <h6 align="right">
+            <button onclick="myFunction('Indicadores')" class="btn btn-info"> Indicadores </button>
+            <button onclick="myFunction('Expediente')" class="btn btn-info"> Expediente Médico </button>
+            {% if sexo == 'MUJER' %}
+                <button onclick="myFunction('Ginecologicos')" class="btn btn-info"> Expediente Ginecológico </button>
+            {% endif %}
+        
+        </h6>
+        <hr/>
+        
+        {% comment %} DIVS QUE SALEN DE LOS BOTONES {% endcomment %}
+        <div class="position-fixed" style="display:none" id ="Indicadores">
+            <button id='close' onclick="myFunction('Indicadores')" class="btn btn-close" style="margin-left:95%; left:-5"> </button>
+            {% comment %}  {% endcomment %}
+            <h4> INDICADORES </h4>
+            <hr/>
+            <table class="table table-striped|table-responsive">   
+                {% for key, value in indicadores.items %}
+                    <tr><td>{{key}}</td> 
+                        <td>{{value}}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% comment %} TERMINA DIV 1  {% endcomment %}
+        {% comment %} DIV 2 {% endcomment %}
+        <div class="position-fixed" style="display:none" id ="Expediente">
+            <button id='close' onclick="myFunction('Expediente')" class="btn btn-close" style="margin-left:95%; left:-5"> </button>
+            <h4  style="background-color:#FFFFFF" ><strong> EXPEDIENTE CLINICO </strong> </h4>
+            <hr/>
+            <table class="table table-striped|table-responsive">
+                {% for field, value in expediente.items %}
+                            {% comment %} {% for objs in objects %} {% endcomment %}
+                    <tr><td>{{ field }}:</td>                    
+                        <td>{{ value }} </td></tr>
+                {% endfor %}
+            </table> 
+            
+            <h6  style="background-color:#FFFF00"> ALERGIAS </h6>
+            <table class="table table-striped|table-responsive">
+            {% if alergias%}
+                {% for alergia in alergias %}
+                    <tr><td>{{alergia.alergia_a__compuesto }}</td></tr>
+                {% endfor %}
+            {% else %}
+                <h8> -- SIN ALERGIAS DETECTADAS -- </h8>
+            {% endif %}
+            </table>
+
+            <h6 style="background-color:#FFFF00"> OPERACIONES PREVIAS </h6>
+            <table class="table table-striped|table-responsive">
+                {% for operacion in operaciones %}
+                    <tr><td>{{operacion.operacion_recibida__operacion}}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% comment %} TERMINA DIV 2  {% endcomment %}
+        {% comment %} DIVS QUE SALEN DE LOS BOTONES {% endcomment %}
+        <div class="position-fixed" style="display:none" id ="Ginecologicos"  bg-warning>
+            <button id='close' onclick="myFunction('Ginecologicos')" class="btn btn-close" style="margin-left:95%; left:-5"> </button>
+            <h4> EXPEDIENTE GINECOLOGICO </h4>
+            <hr/>
+            <table class="table table-striped|table-responsive">
+                {% for key, value in ginecologicos.items %}
+                    <tr><td>{{key}}</td> <td>{{value}}</td></tr>
+                {% endfor %}
+            </table>
+            <h6  style="background-color:#FFFF00"> ETS </h6>
+            <table class="table table-striped|table-responsive">
+                {% for dato in ets %}
+                    <tr><td>{{dato}}</td> </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% comment %} TERMINA DIV 3  {% endcomment %}
+
+        
+        <form method = "POST" autocomplete="off">
+        <div class="form-group">
+            <table class="table table-striped|table-responsive">
+            {% csrf_token %}
+            {{ appointment.as_table }}
+            </table>
+        </div>
+        <div class="form-actions">
+            <input name="register" id="" class="btn btn-primary" type="submit" value="REGISTRAR">
+            <a href="{% url 'home' %}" class="btn btn-warning" >CANCELAR</a>
+        </div>
+    </form>
+    </div>
+</section>
+
+
+<script>
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+    </script>
+<script>
+    function myFunction(elemento) {
+        var x = document.getElementById(elemento);
+        if (x.style.display === "none") {
+          x.style.display = "block";
+        } else {
+          x.style.display = "none";
+        }
+      }
+</script>
+{% endblock %}
